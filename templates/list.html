@@ -32,7 +32,7 @@
     </div>
     <!-- /.card-footer -->
     <div class="card-footer">
-      <button class="btn btn-primary btn-flat"><i class="fas fa-plus"></i> Nuevo registro</button>
+      <a href="{{ create_url }}" class="btn btn-primary btn-flat btnTest"><i class="fas fa-plus"></i> Nuevo registro</a>
     </div>
     <!-- /.card-body -->
   </div>
@@ -44,6 +44,22 @@
       $('#data').DataTable({
         responsive: true,
         autoWidth: false
+      })
+    
+      $('.btnTest').on('click', function () {
+        $.ajax({
+          url: '{% url "calibus:role_list" %}',
+          type: 'POST',
+          data: { id: 1 },
+          dataType: 'Json'
+        })
+          .done(function (data) {
+            console.log(data)
+          })
+          .fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown)
+          })
+          .always(function (data) {})
       })
     })
   </script>
