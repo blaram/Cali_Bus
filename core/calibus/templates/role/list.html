@@ -14,8 +14,8 @@
       <td>{{ r.id }}</td>
       <td>{{ r.name }}</td>
       <td>
-        <button type="button" class="btn btn-warning btn-xs"><i class="fas fa-edit btn-flat"></i></button>
-        <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt btn-flat"></i></button>
+        <a href="{% url 'calibus:role_update' r.id %}" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a>
+        <a href="{% url 'calibus:role_delete' r.id %}" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>
       </td>
     </tr>
   {% endfor %}

@@ -61,7 +61,7 @@
       var parameters = $(this).serializeArray();
   
       $.ajax({
-        url: '{% url "calibus:role_create" %}',
+        url: window.location.pathname,
         type: 'POST',
         data: parameters,
         dataType: 'Json'
