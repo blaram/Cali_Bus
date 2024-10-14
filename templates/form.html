@@ -5,7 +5,14 @@
   <form action="." method="POST">
     <div class="card card-default">
       <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-plus"></i> {{ title }}</h3>
+        <h3 class="card-title">
+          {% if action == 'add' %}
+            <i class="fas fa-plus"></i>
+          {% else %}
+            <i class="fas fa-edit"></i>
+          {% endif %}
+          {{ title }}
+        </h3>
       </div>
       <!-- /.card-header -->
       <div class="card-body">

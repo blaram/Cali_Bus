@@ -2,10 +2,10 @@
 {% load widget_tweaks %}
 
 {% block content %}
-  <form action="" method="POST">
+  <form action="." method="POST">
     <div class="card card-default">
       <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-plus"></i> {{ title }}</h3>
+        <h3 class="card-title"><i class="fas fa-trash"></i> {{ title }}</h3>
       </div>
       <!-- /.card-header -->
       <div class="card-body">
@@ -38,4 +38,29 @@
       <!-- /.card-body -->
     </div>
   </form>
+  <script>
+    $('form').on('submit', function (e) {
+      e.preventDefault()
+      var parameters = $(this).serializeArray()
+    
+      $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        data: parameters,
+        dataType: 'Json'
+      })
+        .done(function (data) {
+          console.log(data)
+          if (!data.hasOwnProperty('error')) {
+            location.href = '{{ list_url }}'
+            return false
+          }
+          message_error(data.error)
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+          alert(textStatus + ': ' + errorThrown)
+        })
+        .always(function (data) {})
+    })
+  </script>
 {% endblock %}
