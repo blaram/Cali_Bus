@@ -8,6 +8,9 @@
   <script src="{% static 'lib/datatables-1.10.20/js/dataTables.bootstrap4.min.js' %}"></script>
   <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
   <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
+  {% block head_list %}
+
+  {% endblock %}
 {% endblock %}
 
 {% block content %}
@@ -46,21 +49,21 @@
         autoWidth: false
       })
     
-      $('.btnTest').on('click', function () {
-        $.ajax({
-          url: '{% url "calibus:role_list" %}',
-          type: 'POST',
-          data: { id: 1 },
-          dataType: 'Json'
-        })
-          .done(function (data) {
-            console.log(data)
-          })
-          .fail(function (jqXHR, textStatus, errorThrown) {
-            alert(textStatus + ': ' + errorThrown)
-          })
-          .always(function (data) {})
-      })
+      //$('.btnTest').on('click', function () {
+      //  $.ajax({
+      //    url: '{% url "calibus:role_list" %}',
+      //    type: 'POST',
+      //    data: { id: 1 },
+      //    dataType: 'Json'
+      // })
+      //    .done(function (data) {
+      //      console.log(data)
+      //    })
+      //    .fail(function (jqXHR, textStatus, errorThrown) {
+      //      alert(textStatus + ': ' + errorThrown)
+      //    })
+      //    .always(function (data) {})
+      //})
     })
   </script>
 {% endblock %}

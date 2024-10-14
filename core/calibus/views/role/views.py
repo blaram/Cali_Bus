@@ -22,22 +22,23 @@ class RoleListView(ListView):
     model = Role
     template_name = 'role/list.html'
 
-    # def get_queryset(self):
-    #     return Role.objects.all()
-
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        # if request.method == 'GET':
-        #     return redirect('calibus:role_list2')
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            data = rol = Role.objects.get(pk=request.POST['id']).toJSON()
+            action = request.POST['action']
+            if action == 'searchdata':
+                data = []
+                for i in Role.objects.all():
+                    data.append(i.toJSON())
+            else:
+                data['error'] = 'Ha ocurrido un error'
         except Exception as e:
             data['error'] = str(e)
-        return JsonResponse(data)
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
