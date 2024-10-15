@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     # Apps
     'core.calibus',
+    'core.homepage',
 ]
 
 MIDDLEWARE = [
