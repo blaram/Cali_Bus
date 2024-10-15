@@ -1,21 +1,11 @@
-from django.http import JsonResponse, HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from core.calibus.forms import RoleForm
 from core.calibus.models import Role
-
-
-def role_list(request):
-    data = {
-        'title': 'Listado de Roles',
-        'roles': Role.objects.all()
-    }
-    return render(request, 'role/list.html', data)
 
 
 class RoleListView(ListView):
