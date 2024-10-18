@@ -21,10 +21,10 @@
       <!-- /.login-logo -->
       <div class="card card-outline card-primary">
         <div class="card-header text-center">
-          <a href="../../index2.html" class="h1"><b>Cali</b>BUS</a>
+          <a href="{% url 'index' %}" class="h1"><b>Cali</b>BUS</a>
         </div>
         <div class="card-body">
-          <p class="login-box-msg">Sign in to start your session</p>
+          <p class="login-box-msg">Inicie sesión con sus credenciales</p>
 
           <form action="." method="post">
             {% csrf_token %}
