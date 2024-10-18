@@ -13,10 +13,6 @@ class RoleForm(ModelForm):
     class Meta:
         model = Role
         fields = '__all__'
-        # labels = {
-        #     'name': 'Nombre:',
-        #     'desc': 'Descripción:'
-        # }
         widgets = {
             'name': TextInput(
                 attrs={
@@ -43,3 +39,10 @@ class RoleForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data
+
+    def clean(self):
+        cleaned = super().clean()
+        if len(cleaned['name']) <= 50:
+            raise forms.ValidationError('Validación rrr')
+            # self.add_error('name', 'Le faltan caracteres')
+        return cleaned

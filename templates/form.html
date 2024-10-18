@@ -55,6 +55,10 @@
           errors += '{{ field.label }}: {{ error }}\n';
         {% endfor %}
       {% endfor %}
+
+      {% for error in form.non_field_errors %}
+        errors += '{{ error }}\n';
+      {% endfor %}
       Swal.fire({
         title: '¡Error!',
         text: errors,
@@ -62,7 +66,7 @@
       })
     {% endif %}
 
-    $('form').on('submit', function (e) {
+    /* $('form').on('submit', function (e) {
   
       e.preventDefault();
       var parameters = $(this).serializeArray();
@@ -84,6 +88,6 @@
           alert(textStatus + ': ' + errorThrown)
         })
         .always(function (data) {})
-    })
+    }) */
   </script>
 {% endblock %}

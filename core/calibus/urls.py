@@ -8,4 +8,5 @@ urlpatterns = [
     path('role/add/', RoleCreateView.as_view(), name='role_create'),
     path('role/update/<int:pk>/', RoleUpdateView.as_view(), name='role_update'),
     path('role/delete/<int:pk>/', RoleDeleteView.as_view(), name='role_delete'),
+    path('role/form/', RoleFormView.as_view(), name='role_form'),
 ]
