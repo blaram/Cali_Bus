@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -13,6 +14,7 @@ class RoleListView(ListView):
     template_name = 'role/list.html'
 
     @method_decorator(csrf_exempt)
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
@@ -45,6 +47,11 @@ class RoleCreateView(CreateView):
     template_name = 'role/create.html'
     success_url = reverse_lazy('calibus:role_list')
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         data = {}
         try:
@@ -58,15 +65,6 @@ class RoleCreateView(CreateView):
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data)
-
-    #     print(request.POST)
-    #     form = RoleForm(request.POST)
-    #     if form.is_valid():
-    #         # form.save()
-    #         return HttpResponseRedirect(self.success_url)
-    #     # else:
-    #     #     return render(request, self.template_name, {'form': form})
-    #     print(form.errors)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,6 +81,7 @@ class RoleUpdateView(UpdateView):
     template_name = 'role/create.html'
     success_url = reverse_lazy('calibus:role_list')
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super().dispatch(request, *args, **kwargs)
@@ -115,7 +114,7 @@ class RoleDeleteView(DeleteView):
     template_name = 'role/delete.html'
     success_url = reverse_lazy('calibus:role_list')
 
-    # @method_decorator(csrf_exempt)
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super().dispatch(request, *args, **kwargs)

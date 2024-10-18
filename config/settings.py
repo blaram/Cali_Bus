@@ -129,5 +129,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/calibus/role/list/'
+LOGIN_REDIRECT_URL = '/calibus/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_URL = '/login/'
