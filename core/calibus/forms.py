@@ -43,11 +43,3 @@ class RoleForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data
-
-    def clean(self):
-        cleaned = super().clean()
-        if len(cleaned['name']) <= 50:
-            raise forms.ValidationError('Validacion rrr')
-            # self.add_error('name', 'Le faltan caracteres')
-        print(cleaned)
-        return cleaned

@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     # Apps
     'core.calibus',
     'core.homepage',
-    'core.login',
 ]
 
 MIDDLEWARE = [
@@ -128,8 +127,3 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-LOGIN_REDIRECT_URL = '/calibus/role/list/'
-
-LOGOUT_REDIRECT_URL = '/login/'
