@@ -27,12 +27,12 @@
     <!-- Template Main CSS File -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
 
-    <!--          =======================================================
+    <!--            =======================================================
   * Template Name: iPortfolio - v1.2.0
   * Template URL: https://bootstrapmade.com/iportfolio-bootstrap-portfolio-websites-template/
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
-  ========================================================          -->
+  ========================================================            -->
   </head>
 
   <body>
@@ -72,7 +72,7 @@
               <a href="#contact"><i class="bx bx-envelope"></i> Contact</a>
             </li>
             <li>
-              {% if request.user.is_autheticated %}
+              {% if request.user.is_authenticated %}
                 <a href="{% url 'calibus:dashboard' %}"><i class="bx bx-user"></i> Bienvenid@ {{ request.user.username }}</a>
               {% else %}
                 <a href="{% url 'login' %}"><i class="bx bx-log-in"></i> Iniciar sesión</a>

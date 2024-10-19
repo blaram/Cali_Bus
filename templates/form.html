@@ -42,7 +42,8 @@
       </div>
       <!-- /.card-footer -->
       <div class="card-footer">
-        <button type="submit" class="btn btn-primary btn-flat btnTest"><i class="fas fa-save"></i> Guardar registro</button>
+        <button type="submit" class="btn btn-primary btn-flat"><i class="fas fa-save"></i> Guardar registro</button>
+        <a href="{{ list_url }}" class="btn btn-danger btn-flat"><i class="fas fa-times"></i> Cancelar</a>
       </div>
       <!-- /.card-body -->
     </div>
@@ -66,28 +67,14 @@
       })
     {% endif %}
 
-    /* $('form').on('submit', function (e) {
+    $('form').on('submit', function (e) {
   
       e.preventDefault();
       var parameters = $(this).serializeArray();
-  
-      $.ajax({
-        url: window.location.pathname,
-        type: 'POST',
-        data: parameters,
-        dataType: 'Json'
-      }).done(function (data) {
-        console.log(data);
-          if (!data.hasOwnProperty('error')) {
-            location.href = '{{ list_url}}';
-            return false;
-          }
-          message_error(data.error);
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-          alert(textStatus + ': ' + errorThrown)
-        })
-        .always(function (data) {})
-    }) */
+      submit_with_ajax(window.location.pathname, 'Notificación', '¿Estas seguro de realizar la siguiente acción?', parameters, function () {
+        location.href = '{{ list_url }}';
+      });
+        
+    });
   </script>
 {% endblock %}
