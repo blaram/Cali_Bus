@@ -19,6 +19,9 @@ from django.urls import path, include
 from core.homepage.views import IndexView
 from core.login.views import *
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
@@ -26,3 +29,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('calibus/', include('core.calibus.urls')),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
