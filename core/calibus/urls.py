@@ -2,6 +2,7 @@ from django.urls import path
 from core.calibus.views.role.views import *
 from core.calibus.views.dashboard.views import *
 from core.calibus.views.bus.views import *
+from core.calibus.views.tests.views import TestView
 
 app_name = 'calibus'
 
@@ -19,4 +20,6 @@ urlpatterns = [
     path('bus/delete/<int:pk>/', BusDeleteView.as_view(), name='bus_delete'),
     # home
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    # test
+    path('test/', TestView.as_view(), name='test'),
 ]

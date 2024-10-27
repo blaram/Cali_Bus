@@ -75,3 +75,9 @@ class BusForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data
+
+
+class TestForm(Form):
+    roles = ModelChoiceField(queryset=Role.objects.all(), widget=Select(attrs={
+        'class': 'form-control'
+    }))
