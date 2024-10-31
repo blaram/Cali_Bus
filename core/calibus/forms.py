@@ -27,6 +27,7 @@ class RoleForm(ModelForm):
                 }
             )
         }
+        exclude = ['user_creation', 'user_updated']
 
     def save(self, commit=True):
         data = {}
@@ -81,3 +82,60 @@ class TestForm(Form):
     roles = ModelChoiceField(queryset=Role.objects.all(), widget=Select(attrs={
         'class': 'form-control'
     }))
+
+
+class ClientForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['names'].widget.attrs['autofocus'] = True
+
+    class Meta:
+        model = Client
+        fields = '__all__'
+        widgets = {
+            'names': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese nombres',
+                }
+            ),
+            'surnames': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese apellidos',
+                }
+            ),
+            'ci': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese CI',
+                }
+            ),
+            'phone': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese telefono',
+                }
+            ),
+            'email': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese correo electrónico',
+                }
+            ),
+        }
+        exclude = ['user_updated', 'user_creation']
+
+    def save(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            if form.is_valid():
+                form.save()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data
+
+    # def clean(self):
+    #     cleaned = super().clean()
+    #     if len(cleaned['name']) <= 50:
+    #         raise forms.ValidationError('Validacion xxx')
+    #         # self.add_error('name', 'Le faltan caracteres')
+    #     return cleaned

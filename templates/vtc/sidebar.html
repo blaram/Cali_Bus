@@ -17,7 +17,7 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-header">Mantenimientos</li>
         <li class="nav-item">
-          <a href="{{ request.user.get_image }}" class="nav-link">
+          <a href="{% url 'calibus:role_list' %}" class="nav-link">
             <i class="nav-icon fas fa-id-card"></i>
             <p>Roles</p>
           </a>
