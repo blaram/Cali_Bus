@@ -1,5 +1,5 @@
 from django.forms import *
-from core.calibus.models import Role, Bus
+from core.calibus.models import Role, Bus, Client
 
 
 class RoleForm(ModelForm):

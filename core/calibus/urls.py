@@ -3,6 +3,7 @@ from core.calibus.views.role.views import *
 from core.calibus.views.dashboard.views import *
 from core.calibus.views.bus.views import *
 from core.calibus.views.tests.views import TestView
+from core.calibus.views.client.views import ClientView
 
 app_name = 'calibus'
 
@@ -18,6 +19,8 @@ urlpatterns = [
     path('bus/add/', BusCreateView.as_view(), name='bus_create'),
     path('bus/update/<int:pk>/', BusUpdateView.as_view(), name='bus_update'),
     path('bus/delete/<int:pk>/', BusDeleteView.as_view(), name='bus_delete'),
+    # client
+    path('client/', ClientView.as_view(), name='client'),
     # home
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     # test
