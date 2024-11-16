@@ -1,31 +1,34 @@
+from datetime import datetime
+
 from django.forms import *
-from core.calibus.models import Role, Bus, Client
+
+from core.calibus.models import Route, Travel, Client
 
 
-class RoleForm(ModelForm):
+class RouteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # for form in self.visible_fields():
         #     form.field.widget.attrs['class'] = 'form-control'
         #     form.field.widget.attrs['autocomplete'] = 'off'
-        # self.fields['name'].widget_attrs['autofocus'] = True
+        self.fields['origin'].widget.attrs['autofocus'] = True
 
     class Meta:
-        model = Role
+        model = Route
         fields = '__all__'
         widgets = {
             'name': TextInput(
                 attrs={
-                    'placeholder': 'Ingrese un nombre'
+                    'placeholder': 'Ingrese un nombre',
                 }
             ),
             'desc': Textarea(
                 attrs={
-                    'placeholder': 'Ingrese una descripción',
+                    'placeholder': 'Ingrese un nombre',
                     'rows': 3,
                     'cols': 3
                 }
-            )
+            ),
         }
         exclude = ['user_creation', 'user_updated']
 
@@ -41,26 +44,25 @@ class RoleForm(ModelForm):
             data['error'] = str(e)
         return data
 
-    # def clean(self):
-    #     cleaned = super().clean()
-    #     if len(cleaned['name']) <= 50:
-    #         raise forms.ValidationError('Validación rrr')
-    #         # self.add_error('name', 'Le faltan caracteres')
-    #     return cleaned
 
-
-class BusForm(ModelForm):
+class TravelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.fields['name'].widget.attrs['autofocus'] = True
+        self.fields['status'].widget.attrs['autofocus'] = True
 
     class Meta:
-        model = Bus
+        model = Travel
         fields = '__all__'
         widgets = {
             'name': TextInput(
                 attrs={
                     'placeholder': 'Ingrese un nombre',
+                }
+            ),
+            'cat': Select(
+                attrs={
+                    'class': 'select2',
+                    'style': 'width: 100%'
                 }
             ),
         }
@@ -78,12 +80,6 @@ class BusForm(ModelForm):
         return data
 
 
-class TestForm(Form):
-    roles = ModelChoiceField(queryset=Role.objects.all(), widget=Select(attrs={
-        'class': 'form-control'
-    }))
-
-
 class ClientForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -95,31 +91,31 @@ class ClientForm(ModelForm):
         widgets = {
             'names': TextInput(
                 attrs={
-                    'placeholder': 'Ingrese nombres',
+                    'placeholder': 'Ingrese sus nombres',
                 }
             ),
             'surnames': TextInput(
                 attrs={
-                    'placeholder': 'Ingrese apellidos',
+                    'placeholder': 'Ingrese sus apellidos',
                 }
             ),
-            'ci': TextInput(
+            'dni': TextInput(
                 attrs={
-                    'placeholder': 'Ingrese CI',
+                    'placeholder': 'Ingrese su dni',
                 }
             ),
-            'phone': TextInput(
+            'date_birthday': DateInput(format='%Y-%m-%d',
+                                       attrs={
+                                           'value': datetime.now().strftime('%Y-%m-%d'),
+                                       }
+                                       ),
+            'address': TextInput(
                 attrs={
-                    'placeholder': 'Ingrese telefono',
+                    'placeholder': 'Ingrese su dirección',
                 }
             ),
-            'email': TextInput(
-                attrs={
-                    'placeholder': 'Ingrese correo electrónico',
-                }
-            ),
+            'gender': Select()
         }
-        exclude = ['user_updated', 'user_creation']
 
     def save(self, commit=True):
         data = {}
@@ -139,3 +135,25 @@ class ClientForm(ModelForm):
     #         raise forms.ValidationError('Validacion xxx')
     #         # self.add_error('name', 'Le faltan caracteres')
     #     return cleaned
+
+
+class TestForm(Form):
+    categories = ModelChoiceField(queryset=Route.objects.all(), widget=Select(attrs={
+        'class': 'form-control select2',
+        'style': 'width: 100%'
+    }))
+
+    products = ModelChoiceField(queryset=Travel.objects.none(), widget=Select(attrs={
+        'class': 'form-control select2',
+        'style': 'width: 100%'
+    }))
+
+    # search = CharField(widget=TextInput(attrs={
+    #     'class': 'form-control',
+    #     'placeholder': 'Ingrese una descripción'
+    # }))
+
+    search = ModelChoiceField(queryset=Travel.objects.none(), widget=Select(attrs={
+        'class': 'form-control select2',
+        'style': 'width: 100%'
+    }))

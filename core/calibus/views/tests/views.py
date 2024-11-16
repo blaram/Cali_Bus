@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from core.calibus.forms import TestForm  # Import TestForm
+from django.views.generic import TemplateView
+
+from core.calibus.forms import TestForm
+from core.calibus.models import Travel, Route
 
 
 class TestView(TemplateView):
@@ -18,8 +20,17 @@ class TestView(TemplateView):
         data = {}
         try:
             action = request.POST['action']
-            if action == 'searchdata':
-                pass
+            if action == 'search_product_id':
+                data = [{'id': '', 'text': '------------'}]
+                for i in Travel.objects.filter(cat_id=request.POST['id']):
+                    data.append({'id': i.id, 'text': i.name,
+                                'data': i.cat.toJSON()})
+            elif action == 'autocomplete':
+                data = []
+                for i in Route.objects.filter(name__icontains=request.POST['term'])[0:10]:
+                    item = i.toJSON()
+                    item['text'] = i.name
+                    data.append(item)
             else:
                 data['error'] = 'Ha ocurrido un error'
         except Exception as e:
@@ -28,6 +39,6 @@ class TestView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Select Anidados | Django'
+        context['title'] = 'Select Aninados | Django'
         context['form'] = TestForm()
         return context

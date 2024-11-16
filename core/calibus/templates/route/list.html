@@ -1,0 +1,23 @@
+{% extends 'list.html' %}
+{% load static %}
+{% block head_list %}
+  <script src="{% static 'route/js/list.js' %}"></script>
+{% endblock %}
+
+{% block columns %}
+  <tr>
+    <th scope="col" style="width: 10%;">Nro</th>
+    <th scope="col" style="width: 25%;">Origen</th>
+    <th scope="col" style="width: 25%;">Destino</th>
+    <th scope="col" style="width: 25%;">Tiempo estimado</th>
+    <th scope="col" style="width: 15%;">Opciones</th>
+  </tr>
+{% endblock %}
+
+{% block rows %}
+
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %}

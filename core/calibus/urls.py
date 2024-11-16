@@ -1,26 +1,32 @@
 from django.urls import path
-from core.calibus.views.role.views import *
+from core.calibus.views.route.views import *
+from core.calibus.views.client.views import *
 from core.calibus.views.dashboard.views import *
-from core.calibus.views.bus.views import *
+from core.calibus.views.travel.views import *
 from core.calibus.views.tests.views import TestView
-from core.calibus.views.client.views import ClientView
 
 app_name = 'calibus'
 
 urlpatterns = [
-    # role
-    path('role/list/', RoleListView.as_view(), name='role_list'),
-    path('role/add/', RoleCreateView.as_view(), name='role_create'),
-    path('role/update/<int:pk>/', RoleUpdateView.as_view(), name='role_update'),
-    path('role/delete/<int:pk>/', RoleDeleteView.as_view(), name='role_delete'),
-    path('role/form/', RoleFormView.as_view(), name='role_form'),
-    # bus
-    path('bus/list/', BusListView.as_view(), name='bus_list'),
-    path('bus/add/', BusCreateView.as_view(), name='bus_create'),
-    path('bus/update/<int:pk>/', BusUpdateView.as_view(), name='bus_update'),
-    path('bus/delete/<int:pk>/', BusDeleteView.as_view(), name='bus_delete'),
+    # route
+    path('route/list/', RouteListView.as_view(), name='route_list'),
+    path('route/add/', RouteCreateView.as_view(), name='route_create'),
+    path('route/update/<int:pk>/', RouteUpdateView.as_view(), name='route_update'),
+    path('route/delete/<int:pk>/', RouteDeleteView.as_view(), name='route_delete'),
     # client
-    path('client/', ClientView.as_view(), name='client'),
+    path('client/list/', ClientListView.as_view(), name='client_list'),
+    path('client/add/', ClientCreateView.as_view(), name='client_create'),
+    path('client/update/<int:pk>/',
+         ClientUpdateView.as_view(), name='client_update'),
+    path('client/delete/<int:pk>/',
+         ClientDeleteView.as_view(), name='client_delete'),
+    # travel
+    path('travel/list/', TravelListView.as_view(), name='travel_list'),
+    path('travel/add/', TravelCreateView.as_view(), name='travel_create'),
+    path('travel/update/<int:pk>/',
+         TravelUpdateView.as_view(), name='travel_update'),
+    path('travel/delete/<int:pk>/',
+         TravelDeleteView.as_view(), name='travel_delete'),
     # home
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     # test
