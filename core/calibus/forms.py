@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.forms import *
 
-from core.calibus.models import Route, Travel, Client
+from core.calibus.models import Route, Travel, Client, Parcel, Bus
 
 
 class RouteForm(ModelForm):
@@ -50,6 +50,14 @@ class TravelForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['status'].widget.attrs['autofocus'] = True
 
+        self.fields['departure'].widget.attrs = {
+            'autocomplete': 'off',
+            'class': 'form-control datetimepicker-input',
+            'id': 'departure',
+            'data-target': '#departure',
+            'data-toggle': 'datetimepicker',
+        }
+
     class Meta:
         model = Travel
         fields = '__all__'
@@ -65,6 +73,10 @@ class TravelForm(ModelForm):
                     'style': 'width: 100%'
                 }
             ),
+            'departure': DateInput(format='%Y-%m-%d',
+                                   attrs={
+                                       'value': datetime.now().strftime('%Y-%m-%d'),
+                                   }),
         }
 
     def save(self, commit=True):
@@ -157,3 +169,125 @@ class TestForm(Form):
         'class': 'form-control select2',
         'style': 'width: 100%'
     }))
+
+
+class ParcelForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for form in self.visible_fields():
+            form.field.widget.attrs['class'] = 'form-control'
+            form.field.widget.attrs['autocomplete'] = 'off'
+        self.fields['senderID'].widget.attrs['autofocus'] = True
+        self.fields['senderID'].widget.attrs['class'] = 'form-control select2'
+        self.fields['senderID'].widget.attrs['style'] = 'width: 100%'
+        self.fields['receiverID'].widget.attrs['class'] = 'form-control select2'
+        self.fields['receiverID'].widget.attrs['style'] = 'width: 100%'
+
+        self.fields['date_joined'].widget.attrs = {
+            'autocomplete': 'off',
+            'class': 'form-control datetimepicker-input',
+            'id': 'date_joined',
+            'data-target': '#date_joined',
+            'data-toggle': 'datetimepicker',
+        }
+
+        self.fields['description'].widget.attrs = {
+            'autocomplete': 'off',
+            'class': 'form-control',
+            'rows': '3',
+            'placeholder': 'Escribe aquí la descripción del paquete',
+        }
+
+        self.fields
+
+    class Meta:
+        model = Parcel
+        fields = '__all__'
+        widgets = {
+            'senderID': Select(attrs={
+                'class': 'form-control select2',
+                'style': 'width: 100%'
+            }),
+            'receiverID': Select(attrs={
+                'class': 'form-control select2',
+                'style': 'width: 100%'
+            }),
+            'date_joined': DateInput(
+                format='%d-%m-%Y',
+                attrs={
+                    'value': datetime.now().strftime('%d-%m-%Y'),
+                }
+            ),
+        }
+
+
+class BusForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for form in self.visible_fields():
+            form.field.widget.attrs['class'] = 'form-control'
+            form.field.widget.attrs['autocomplete'] = 'off'
+        self.fields['license_plate'].widget.attrs['autofocus'] = True
+
+    class Meta:
+        model = Bus
+        fields = '__all__'
+        widgets = {
+            'license_plate': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese la placa',
+                }
+            ),
+            'chassis_number': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese el número de chasis',
+                }
+            ),
+            'engine_number': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese el número de motor',
+                }
+            ),
+            'model': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese el modelo',
+                }
+            ),
+            'color': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese el color',
+                }
+            ),
+            'brand': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese la marca',
+                }
+            ),
+            'capacity': NumberInput(
+                attrs={
+                    'placeholder': 'Ingrese la capacidad',
+                }
+            ),
+            'year': NumberInput(
+                attrs={
+                    'placeholder': 'Ingrese el año',
+                }
+            ),
+            'status': CheckboxInput(
+                attrs={
+                    'class': 'form-check-input',
+                }
+            ),
+        }
+
+    def save(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            if form.is_valid():
+                form.save()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data

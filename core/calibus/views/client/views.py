@@ -39,6 +39,7 @@ class ClientListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListVi
         context['create_url'] = reverse_lazy('calibus:client_create')
         context['list_url'] = reverse_lazy('calibus:client_list')
         context['entity'] = 'Clientes'
+        context['segment'] = 'cliente'
         return context
 
 

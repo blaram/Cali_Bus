@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.urls import reverse_lazy
@@ -6,15 +5,15 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from core.calibus.forms import TravelForm
+from core.calibus.forms import BusForm
 from core.calibus.mixins import ValidatePermissionRequiredMixin
-from core.calibus.models import Travel
+from core.calibus.models import Bus
 
 
-class TravelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
-    model = Travel
-    template_name = 'travel/list.html'
-    permission_required = 'calibus.view_travel'
+class BusListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
+    model = Bus
+    template_name = 'bus/list.html'
+    permission_required = 'calibus.view_bus'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -26,7 +25,7 @@ class TravelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListVi
             action = request.POST['action']
             if action == 'searchdata':
                 data = []
-                for i in Travel.objects.all():
+                for i in Bus.objects.all():
                     data.append(i.toJSON())
             else:
                 data['error'] = 'Ha ocurrido un error'
@@ -36,21 +35,21 @@ class TravelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Listado de Viajes'
-        context['create_url'] = reverse_lazy('calibus:travel_create')
-        context['list_url'] = reverse_lazy('calibus:travel_list')
-        context['entity'] = 'Viajes'
+        context['title'] = 'Listado de Buses'
+        context['create_url'] = reverse_lazy('calibus:bus_create')
+        context['list_url'] = reverse_lazy('calibus:bus_list')
+        context['entity'] = 'Buses'
         context['parent'] = 'empresa'
-        context['segment'] = 'viaje'
+        context['segment'] = 'bus'
         return context
 
 
-class TravelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, CreateView):
-    model = Travel
-    form_class = TravelForm
-    template_name = 'travel/create.html'
-    success_url = reverse_lazy('calibus:travel_list')
-    permission_required = 'calibus.add_travel'
+class BusCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, CreateView):
+    model = Bus
+    form_class = BusForm
+    template_name = 'bus/create.html'
+    success_url = reverse_lazy('calibus:bus_list')
+    permission_required = 'calibus.add_bus'
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -71,19 +70,19 @@ class TravelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Creación de un viaje'
-        context['entity'] = 'Viajes'
+        context['title'] = 'Creación de un Bus'
+        context['entity'] = 'Buses'
         context['list_url'] = self.success_url
         context['action'] = 'add'
         return context
 
 
-class TravelUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, UpdateView):
-    model = Travel
-    form_class = TravelForm
-    template_name = 'travel/create.html'
-    success_url = reverse_lazy('calibus:travel_list')
-    permission_required = 'calibus.change_travel'
+class BusUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, UpdateView):
+    model = Bus
+    form_class = BusForm
+    template_name = 'bus/create.html'
+    success_url = reverse_lazy('calibus:bus_list')
+    permission_required = 'calibus.change_bus'
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -105,21 +104,20 @@ class TravelUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Upda
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Edición de un viaje'
-        context['entity'] = 'Viajes'
+        context['title'] = 'Edición de un Bus'
+        context['entity'] = 'Buses'
         context['list_url'] = self.success_url
         context['action'] = 'edit'
         return context
 
 
-class TravelDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, DeleteView):
-    model = Travel
-    template_name = 'travel/delete.html'
-    success_url = reverse_lazy('calibus:travel_list')
-    permission_required = 'calibus.delete_travel'
+class BusDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, DeleteView):
+    model = Bus
+    template_name = 'bus/delete.html'
+    success_url = reverse_lazy('calibus:bus_list')
+    permission_required = 'calibus.delete_bus'
     url_redirect = success_url
 
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super().dispatch(request, *args, **kwargs)
@@ -134,7 +132,7 @@ class TravelDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Dele
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Eliminación de un viaje'
-        context['entity'] = 'Viajes'
+        context['title'] = 'Eliminación de un Bus'
+        context['entity'] = 'Buses'
         context['list_url'] = self.success_url
         return context

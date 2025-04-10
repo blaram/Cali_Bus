@@ -3,6 +3,8 @@ from core.calibus.views.route.views import *
 from core.calibus.views.client.views import *
 from core.calibus.views.dashboard.views import *
 from core.calibus.views.travel.views import *
+from core.calibus.views.parcel.views import ParcelCreateView
+from core.calibus.views.bus.views import *
 from core.calibus.views.tests.views import TestView
 
 app_name = 'calibus'
@@ -31,4 +33,11 @@ urlpatterns = [
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     # test
     path('test/', TestView.as_view(), name='test'),
+    # parcel
+    path('parcel/add/', ParcelCreateView.as_view(), name='parcel_create'),
+    # bus
+    path('bus/list/', BusListView.as_view(), name='bus_list'),
+    path('bus/add/', BusCreateView.as_view(), name='bus_create'),
+    path('bus/update/<int:pk>/', BusUpdateView.as_view(), name='bus_update'),
+    path('bus/delete/<int:pk>/', BusDeleteView.as_view(), name='bus_delete'),
 ]

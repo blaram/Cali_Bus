@@ -8,6 +8,12 @@ from config.settings import MEDIA_URL, STATIC_URL
 from core.calibus.choices import gender_choices
 from core.models import BaseModel
 
+# Define una función para obtener la hora actual
+
+
+def current_time():
+    return datetime.now().time()
+
 
 class Route(BaseModel):
     origin = models.CharField(
@@ -41,35 +47,15 @@ class Route(BaseModel):
         ordering = ['id']
 
 
-class Travel(models.Model):
-    rou = models.ForeignKey(
-        Route, on_delete=models.CASCADE, verbose_name='Ruta')
-    departure = models.DateField(
-        default=datetime.now, verbose_name='Fecha de salida')
-    arrival = models.DateField(
-        default=datetime.now, verbose_name='Fecha de llegada')
-    status = models.BooleanField(default=True, verbose_name='Estado')
-
-    def __str__(self):
-        return self.departure
-
-    def toJSON(self):
-        item = model_to_dict(self)
-        item['rou'] = self.rou.toJSON()
-        return item
-
-    class Meta:
-        db_table = 'Viajes'
-        verbose_name = 'Viaje'
-        verbose_name_plural = 'Viajes'
-        ordering = ['id']
-
-
 class Client(models.Model):
     names = models.CharField(max_length=150, verbose_name='Nombres')
     surnames = models.CharField(max_length=150, verbose_name='Apellidos')
     ci = models.CharField(max_length=10, unique=True,
                           verbose_name='Cédula de Identidad')
+    nationality = models.CharField(
+        max_length=20, default="Desconocido", verbose_name='Nacionalidad')
+    date_of_birth = models.DateField(
+        default=datetime.now, verbose_name='Fecha de nacimiento')
     phone = models.CharField(max_length=10, verbose_name='Teléfono')
     email = models.CharField(max_length=100, verbose_name='Correo electrónico')
     gender = models.CharField(
@@ -90,16 +76,73 @@ class Client(models.Model):
         ordering = ['id']
 
 
+class Bus(models.Model):
+    license_plate = models.CharField(max_length=10, verbose_name='Placa')
+    chassis_number = models.CharField(
+        max_length=20, verbose_name='Número de chasis')
+    engine_number = models.CharField(
+        max_length=20, verbose_name='Número de motor')
+    model = models.CharField(max_length=30, verbose_name='Modelo')
+    color = models.CharField(max_length=20, verbose_name='Color')
+    brand = models.CharField(max_length=30, verbose_name='Marca')
+    capacity = models.PositiveIntegerField(verbose_name='Capacidad')
+    year = models.PositiveIntegerField(verbose_name='Año')
+    status = models.BooleanField(default=True, verbose_name='Estado')
+
+    def __str__(self):
+        return self.license_plate
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
+    class Meta:
+        db_table = 'Buses'
+        verbose_name = 'Bus'
+        verbose_name_plural = 'Buses'
+        ordering = ['id']
+
+
+class Travel(models.Model):
+    routeID = models.ForeignKey(
+        Route, on_delete=models.CASCADE, verbose_name='Ruta')
+    busID = models.ForeignKey(
+        Bus, on_delete=models.CASCADE, verbose_name='Bus')
+    departure = models.DateField(
+        default=datetime.now, verbose_name='Fecha de salida')
+    departure_time = models.TimeField(
+        default=current_time, verbose_name='Hora de salida')
+    arrival = models.DateField(
+        default=datetime.now, verbose_name='Fecha de llegada')
+    status = models.BooleanField(default=True, verbose_name='Estado')
+
+    def __str__(self):
+        return self.departure
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['route'] = self.routeID.toJSON()
+        return item
+
+    class Meta:
+        db_table = 'Viajes'
+        verbose_name = 'Viaje'
+        verbose_name_plural = 'Viajes'
+        ordering = ['id']
+
+
 class Parcel(models.Model):
     senderID = models.ForeignKey(
         Client, on_delete=models.CASCADE, related_name='sent_parcels')
     receiverID = models.ForeignKey(
         Client, on_delete=models.CASCADE, related_name='received_parcels')
+    travelID = models.ForeignKey(Travel, on_delete=models.CASCADE)
+    date_joined = models.DateField(default=datetime.now)
     description = models.TextField(
         null=True, blank=True, verbose_name='Descripción')
     weight = models.DecimalField(
         default=0.00, max_digits=9, decimal_places=2, verbose_name='Peso')
-    declare_value = models.DecimalField(
+    declared_value = models.DecimalField(
         default=0.00, max_digits=9, decimal_places=2, verbose_name='Valor declarado')
     shipping_cost = models.DecimalField(
         default=0.00, max_digits=9, decimal_places=2, verbose_name='Costo de envío')
@@ -107,6 +150,9 @@ class Parcel(models.Model):
 
     def __str__(self):
         return self.senderID.names
+
+    # def __str__(self):
+    #    return f"{self.senderID.names} -> {self.receiverID.names} ({self.description[:20]})"
 
     class Meta:
         db_table = 'Encomiendas'

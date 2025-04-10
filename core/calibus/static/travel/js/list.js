@@ -1,4 +1,5 @@
 $(function () {
+
     $('#data').DataTable({
         responsive: true,
         autoWidth: false,
@@ -14,8 +15,9 @@ $(function () {
         },
         columns: [
             { "data": "id" },
-            { "data": "rou.origin" },
+            { "data": "route.origin" },
             { "data": "departure" },
+            { "data": "departure_time" },
             { "data": "arrival" },
             { "data": "status" },
             { "data": "id" },

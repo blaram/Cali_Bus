@@ -39,6 +39,8 @@ class RouteListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListVie
         context['create_url'] = reverse_lazy('calibus:route_create')
         context['list_url'] = reverse_lazy('calibus:route_list')
         context['entity'] = 'Rutas'
+        context['parent'] = 'empresa'
+        context['segment'] = 'ruta'
         return context
 
 
@@ -69,9 +71,11 @@ class RouteCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Creat
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Creación una ruta'
-        context['entity'] = 'rutas'
+        context['entity'] = 'Rutas'
         context['list_url'] = self.success_url
         context['action'] = 'add'
+        context['parent'] = 'empresa'
+        context['segment'] = 'ruta'
         return context
 
 
@@ -106,6 +110,8 @@ class RouteUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Updat
         context['entity'] = 'Rutas'
         context['list_url'] = self.success_url
         context['action'] = 'edit'
+        context['parent'] = 'empresa'
+        context['segment'] = 'ruta'
         return context
 
 
@@ -131,6 +137,8 @@ class RouteDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Delet
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Eliminación de una ruta'
-        context['entity'] = 'rutas'
+        context['entity'] = 'Rutas'
         context['list_url'] = self.success_url
+        context['parent'] = 'empresa'
+        context['segment'] = 'ruta'
         return context
