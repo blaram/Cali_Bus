@@ -89,8 +89,7 @@
                         <div class="form-group">
                           <label>Salidas:</label>
                           <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Escoja un bus para la encomienda" autocomplete="off" />
-                            <span class="input-group-append"><button type="button" class="btn btn-danger btn-flat"><i class="fas fa-times"></i></button></span>
+                            {{ form.travelID }}
                           </div>
                         </div>
                       </div>
@@ -111,10 +110,18 @@
                         <th>Peso</th>
                         <th>Valor declarado</th>
                         <th>Costo de envío</th>
+                        <th>Salida</th>
                         <th>Acción</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
+                    <tfoot>
+                      <tr>
+                          <th colspan="4" class="text-right">Total:</th>
+                          <th id="totalShippingCost">0.00</th>
+                          <th></th>
+                      </tr>
+                  </tfoot>
                   </table>
                 </div>
               </div>

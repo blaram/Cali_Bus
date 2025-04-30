@@ -177,6 +177,8 @@ class ParcelForm(ModelForm):
         for form in self.visible_fields():
             form.field.widget.attrs['class'] = 'form-control'
             form.field.widget.attrs['autocomplete'] = 'off'
+        
+        # Personalización de los campos senderID y receiverID
         self.fields['senderID'].widget.attrs['autofocus'] = True
         self.fields['senderID'].widget.attrs['class'] = 'form-control select2'
         self.fields['senderID'].widget.attrs['style'] = 'width: 100%'
@@ -198,7 +200,10 @@ class ParcelForm(ModelForm):
             'placeholder': 'Escribe aquí la descripción del paquete',
         }
 
-        self.fields
+        # Personalización del campo travelID
+        self.fields['travelID'].queryset = Travel.objects.filter(status=True)  # Solo viajes activos
+        self.fields['travelID'].widget.attrs['class'] = 'form-control select2'
+        self.fields['travelID'].widget.attrs['style'] = 'width: 100%'
 
     class Meta:
         model = Parcel

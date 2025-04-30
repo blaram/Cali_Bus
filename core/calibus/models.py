@@ -117,8 +117,8 @@ class Travel(models.Model):
     status = models.BooleanField(default=True, verbose_name='Estado')
 
     def __str__(self):
-        return self.departure
-
+        return f"{self.routeID.origin} -> {self.routeID.destination} ({self.departure} {self.departure_time})"
+        
     def toJSON(self):
         item = model_to_dict(self)
         item['route'] = self.routeID.toJSON()
