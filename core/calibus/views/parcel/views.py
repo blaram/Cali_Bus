@@ -2,6 +2,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 from django.views.generic import CreateView
 
@@ -17,6 +20,7 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
     permission_required = 'calibus.add_parcel'
     url_redirect = success_url
 
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
@@ -25,8 +29,20 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
         try:
             action = request.POST['action']
             if action == 'add':
-                form = self.get_form()
-                data = form.save()
+                parcels = json.loads(request.POST.get('parcels', '[]'))
+                for parcel_data in parcels:
+                    parcel = Parcel()
+                    parcel.senderID_id = parcel_data['senderID']
+                    parcel.receiverID_id = parcel_data['receiverID']
+                    parcel.travelID_id = parcel_data['travelID']
+                    parcel.date_joined = parcel_data['date_joined']
+                    parcel.description = parcel_data['description']
+                    parcel.weight = parcel_data['weight']
+                    parcel.declared_value = parcel_data['declared_value']
+                    parcel.shipping_cost = parcel_data['shipping_cost']
+                    parcel.status = True
+                    parcel.save()
+                data['message'] = 'Encomiendas guardadas correctamente.'
             else:
                 data['error'] = 'No ha ingresado a ninguna opción'
         except Exception as e:
