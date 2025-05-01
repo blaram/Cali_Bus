@@ -154,6 +154,13 @@ class Parcel(models.Model):
     # def __str__(self):
     #    return f"{self.senderID.names} -> {self.receiverID.names} ({self.description[:20]})"
 
+    def toJSON(self):
+        data = model_to_dict(self)
+        data['senderID'] = f"{self.senderID.names} {self.senderID.surnames}"  # Combina nombres y apellidos
+        data['receiverID'] = f"{self.receiverID.names} {self.receiverID.surnames}"
+        data['travelID'] = f"{self.travelID.routeID.origin} -> {self.travelID.routeID.destination} ({self.travelID.departure} {self.travelID.departure_time})"
+        return data
+
     class Meta:
         db_table = 'Encomiendas'
         verbose_name = 'Encomienda'

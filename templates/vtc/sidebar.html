@@ -57,19 +57,38 @@
             <p>Venta de Pasajes</p>
           </a>
         </li>
-
-        <li class="nav-item">
-          <a href="#" class="nav-link {% if 'widgets' in segment %}active{% endif %}">
-            <i class="nav-icon fas fa-dolly"></i>
-            <p>Envío de Encomiendas</p>
+        
+        <li class="nav-item has-treeview {% if 'envios' in parent %} menu-open {% endif %}">
+          <a href="#" class="nav-link {% if 'envios' in parent %}active{% endif %}">
+            <i class="nav-icon fas fa-exchange-alt"></i>
+            <p>
+              Envíos
+              <i class="fas fa-angle-left right"></i>
+            </p>
           </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'calibus:parcel_list' %}" class="nav-link {% if 'encomienda' in segment %} active {% endif %}">
+                <i class="nav-icon fas fa-dolly"></i>
+                <p>Encomiendas</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-hand-holding-usd"></i>
+                <p>Giros</p>
+              </a>
+            </li>
+          </ul>
         </li>
+
         <li class="nav-item">
           <a href="{% url 'calibus:client_list' %}" class="nav-link {% if 'cliente' in segment %}active{% endif %}">
             <i class="nav-icon fas fa-users"></i>
             <p>Clientes</p>
           </a>
         </li>
+
         <li class="nav-item {% if 'layout' in parent %} menu-open {% endif %}">
           <a href="#" class="nav-link {% if 'layout' in parent %}active{% endif %}">
             <i class="nav-icon fas fa-clipboard-list"></i>
@@ -93,6 +112,7 @@
             </li>
           </ul>
         </li>
+
         <li class="nav-item {% if 'layout' in parent %} menu-open {% endif %}">
           <a href="#" class="nav-link {% if 'layout' in parent %}active{% endif %}">
             <i class="nav-icon fas fa-chart-pie"></i>

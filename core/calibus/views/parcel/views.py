@@ -6,10 +6,44 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
 from core.calibus.models import Parcel
 from core.calibus.forms import ParcelForm
+
+
+class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
+    model = Parcel
+    template_name = 'parcel/list.html'
+    permission_required = 'calibus.view_parcel'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'searchdata':
+                data = []
+                for i in Parcel.objects.all():
+                    data.append(i.toJSON())  # Asegúrate de que el modelo Parcel tenga un método `toJSON`
+            else:
+                data['error'] = 'Ha ocurrido un error'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Listado de Encomiendas'
+        context['create_url'] = reverse_lazy('calibus:parcel_create')
+        context['list_url'] = reverse_lazy('calibus:parcel_list')
+        context['entity'] = 'Encomiendas'
+        context['parent'] = 'envios'
+        context['segment'] = 'encomienda'
+        return context
 
 
 class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, CreateView):

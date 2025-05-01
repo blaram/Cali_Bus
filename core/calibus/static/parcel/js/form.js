@@ -8,6 +8,21 @@ $(function () {
         $('#totalShippingCost').text(total.toFixed(2));
     }
 
+    $('.select2').select2({
+        theme: 'bootstrap4',
+        language: 'es',
+        placeholder: 'Seleccione una opción',
+        allowClear: true
+    });
+
+    $('#date_joined').datetimepicker({
+        format: 'YYYY-MM-DD',
+        date: moment().format('YYYY-MM-DD'),
+        locale: 'es',
+        //maxDate: moment().format('YYYY-MM-DD'),
+        minDate: moment().format('YYYY-MM-DD'),
+    });
+
     $('#add-to-table').on('click', function () {
         const description = $('[name="description"]').val();
         const weight = $('[name="weight"]').val();
