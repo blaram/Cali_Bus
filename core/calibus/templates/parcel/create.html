@@ -7,7 +7,7 @@
   <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>
   <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>
 
-  <script src="{% static 'lib/moment-2.25.3/moment.js' %}"></script>
+  <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>
   <script src="{% static 'lib/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.js' %}"></script>
   <link href="{% static 'lib/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.css' %}" rel="stylesheet" />
 
@@ -60,29 +60,47 @@
                 <div class="col-md-4">
                   <div class="form-group">
                     <div class="row">
-                      
                       <div class="col-sm-12">
                         <div class="form-group">
                           <label>Descripción:</label>
                           {{ form.description }}
                         </div>
                       </div>
-                      <div class="col-sm-12">
-                        <div class="form-group">
-                          <label>Peso:</label>
-                          {{ form.weight }}
-                        </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-6">
+                          <div class="form-group">
+                              <label>Peso:</label>
+                              <div class="input-group">
+                                {{ form.weight }}
+                                <div class="input-group-append">
+                                  <span class="input-group-text">Kg</span>
+                                </div>
+                              </div>
+                          </div>
                       </div>
-                      <div class="col-sm-12">
-                        <div class="form-group">
-                          <label>Valor declarado:</label>
-                          {{ form.declared_value }}
-                        </div>
-                      </div>      
+                      <div class="col-sm-6">
+                          <div class="form-group">
+                              <label>Valor declarado:</label>
+                              <div class="input-group">
+                                {{ form.declared_value }}
+                                <div class="input-group-append">
+                                  <span class="input-group-text">Bs.</span>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="row">
                       <div class="col-sm-12">
                         <div class="form-group">
                           <label>Costo de envio:</label>
-                          {{ form.shipping_cost }}
+                          <div class="input-group">
+                            {{ form.shipping_cost }}
+                            <div class="input-group-append">
+                              <span class="input-group-text">Bs.</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       <div class="col-sm-12">
@@ -102,30 +120,31 @@
                 <div class="col-md-8">
                   <label>Tabla de Encomiendas</label>
                   <hr>
-                  <table class="table table-bordered" id="tblParcels">
-                    <thead>
-                      <tr>
-                        <th>Cantidad</th>
-                        <th>Descripción</th>
-                        <th>Peso</th>
-                        <th>Valor declarado</th>
-                        <th>Costo de envío</th>
-                        <th>Salida</th>
-                        <th>Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                    <tfoot>
-                      <tr>
-                          <th colspan="4" class="text-right">Total:</th>
-                          <th id="totalShippingCost">0.00</th>
-                          <th></th>
-                      </tr>
-                  </tfoot>
-                  </table>
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="tblParcels">
+                      <thead>
+                        <tr>
+                          <th class="text-center" style="width: 5%;">Cantidad</th>
+                          <th style="width: 25%;">Descripción</th>
+                          <th class="text-center" style="width: 10%;">Peso (Kg)</th>
+                          <th class="text-center" style="width: 15%;">Valor declarado (Bs.)</th>
+                          <th class="text-center" style="width: 15%;">Costo de envío (Bs.)</th>
+                          <th style="width: 20%;">Salida</th>
+                          <th class="text-center" style="width: 10%;">Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                      <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-right">Total:</th>
+                            <th id="totalShippingCost">0.00</th>
+                            <th></th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>

@@ -179,7 +179,6 @@ class ParcelForm(ModelForm):
             form.field.widget.attrs['autocomplete'] = 'off'
         
         # Personalización de los campos senderID y receiverID
-        self.fields['senderID'].widget.attrs['autofocus'] = True
         self.fields['senderID'].widget.attrs['class'] = 'form-control select2'
         self.fields['senderID'].widget.attrs['style'] = 'width: 100%'
         self.fields['receiverID'].widget.attrs['class'] = 'form-control select2'
@@ -191,6 +190,7 @@ class ParcelForm(ModelForm):
             'id': 'date_joined',
             'data-target': '#date_joined',
             'data-toggle': 'datetimepicker',
+            'readonly': True,
         }
 
         self.fields['description'].widget.attrs = {

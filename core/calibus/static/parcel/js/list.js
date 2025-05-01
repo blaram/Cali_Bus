@@ -2,7 +2,9 @@ $(function () {
 
     $('.select2').select2({
         theme: 'bootstrap4',
-        language: 'es'
+        language: 'es',
+        placeholder: 'Seleccione una opción',
+        allowClear: true
     });
 
     $('#date_joined').datetimepicker({
