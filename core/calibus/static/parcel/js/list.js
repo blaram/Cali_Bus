@@ -28,8 +28,15 @@ $(function () {
                 render: function (data, type, row) {
                     // Usar parcelChoices para obtener el texto del estado
                     const translatedStatus = parcelChoices[data] || data; // If not found, use the original value
-                    // Button to change the status
-                    return `<button type="button" class="btn btn-sm btn-info btn-change-status" data-id="${row.id}" data-status="${data}">
+                    const statusColors = {
+                        'pending': 'btn-warning',
+                        'in_transit': 'btn-secondary',
+                        'ready_for_pickup': 'btn-primary',
+                        'delivered': 'btn-success',
+                        'cancelled': 'btn-danger'
+                    };
+                    // Retornar el botón con la clase de color correcta
+                    return `<button type="button" class="btn btn-sm ${statusColors[data]} btn-change-status" data-id="${row.id}" data-status="${data}"> 
                                 ${translatedStatus}
                             </button>`;
                 }
@@ -51,9 +58,6 @@ $(function () {
                 const parcelId = $(this).data('id');
                 const currentStatus = $(this).data('status');
 
-                console.log("Botón clickeado. ID:", parcelId, "Estado actual:", currentStatus); // Depuración
-
-
                 // Display a modal or confirmation to change the status
                 Swal.fire({
                     title: 'Cambiar estado',
@@ -63,11 +67,9 @@ $(function () {
                     confirmButtonText: 'Si, cambiar',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
-                    console.log("Resultado de la confirmación:", result); // Depuración
-                    console.log("Resultado de la confirmación:", result.isConfirmed); // Depuración
+
                     if (result.value) {
-                        console.log("Confirmado. Enviando solicitud AJAX..."); // Depuración
-                        // Change the request to the backend to change the state
+
                         $.ajax({
                             url: '/calibus/parcel/change_status/',
                             type: 'POST',
@@ -78,10 +80,42 @@ $(function () {
                                 // csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
                             },
                             success: function (response) {
-                                console.log("Respuesta del servidor:", response);
                                 if (!response.error) {
                                     Swal.fire('Éxito', 'El estado ha sido cambiado.', 'success');
-                                    $('#data').DataTable().ajax.reload(); // Reload the Datatable
+
+                                    // Update the button class and text
+                                    const nextStatus = {
+                                        'pending': 'in_transit',
+                                        'in_transit': 'ready_for_pickup',
+                                        'ready_for_pickup': 'delivered',
+                                        'delivered': 'cancelled',
+                                        'cancelled': 'pending'
+                                    };
+
+                                    const statusColors = {
+                                        'pending': 'btn-warning',
+                                        'in_transit': 'btn-secondary',
+                                        'ready_for_pickup': 'btn-primary',
+                                        'delivered': 'btn-success',
+                                        'cancelled': 'btn-danger'
+                                    };
+
+                                    const newStatus = nextStatus[currentStatus];  // Get the new status
+                                    const translatedStatus = parcelChoices[newStatus] || newStatus;
+                                    const button = $(`button[data-id="${parcelId}"]`);
+                                    console.log("Botón seleccionado:", button);
+
+                                    // Update the button text and class
+                                    button
+                                        .text(translatedStatus)
+                                        .data('status', newStatus)
+                                        .removeClass('btn-warning btn-primary btn-success btn-secondary btn-danger btn-info') // Eliminar clases antiguas
+                                        .addClass(statusColors[newStatus]);
+
+                                    console.log("Clases del boton despues de actualizar:", button.attr('class'));
+
+                                    // Recharge the DataTable if necessary
+                                    $('#data').DataTable().ajax.reload(null, false); // Reload the Datatable
                                 } else {
                                     Swal.fire('Error', response.error, 'error');
                                 }
