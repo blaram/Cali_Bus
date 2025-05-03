@@ -36,6 +36,7 @@ urlpatterns = [
     # parcel
     path('parcel/list/', ParcelListView.as_view(), name='parcel_list'),
     path('parcel/add/', ParcelCreateView.as_view(), name='parcel_create'),
+    path('parcel/change_status/', change_status, name='parcel_change_status'),
     # bus
     path('bus/list/', BusListView.as_view(), name='bus_list'),
     path('bus/add/', BusCreateView.as_view(), name='bus_create'),

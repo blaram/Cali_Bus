@@ -8,16 +8,18 @@
 {% block columns %}
   <tr>
     <th scope="col" style="width: 5%;">Nro</th>
-    <th scope="col" style="width: 20%;">Descripción</th>
-    <th scope="col" style="width: 15%;">Remitente</th>
-    <th scope="col" style="width: 15%;">Consignatario</th>
-    <th scope="col" style="width: 10%;">Salida</th>
-    <th scope="col" style="width: 10%;">Peso (Kg)</th>
+    <th scope="col" style="width: 20%;">Remitente</th>
+    <th scope="col" style="width: 20%;">Consignatario</th>
+    <th scope="col" style="width: 20%;">Bus y Salida</th>
     <th scope="col" style="width: 10%;">Costo de Envío (Bs.)</th>
+    <th scope="col" style="width: 10%;">Estado</th>
     <th scope="col" style="width: 15%;">Opciones</th>
   </tr>
 {% endblock %}
 
 {% block javascript %}
-
+  <script>
+    const parcelChoices = {{ parcel_choices|safe }};
+    console.log(parcelChoices);
+  </script>
 {% endblock %}

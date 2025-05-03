@@ -11,6 +11,8 @@ from django.views.generic import CreateView, ListView
 
 from core.calibus.models import Parcel, ParcelItem
 from core.calibus.forms import ParcelForm
+from core.calibus.choices import parcel_choices
+
 
 
 class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
@@ -44,6 +46,7 @@ class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListVi
         context['entity'] = 'Encomiendas'
         context['parent'] = 'envios'
         context['segment'] = 'encomienda'
+        context['parcel_choices'] = json.dumps(dict(parcel_choices))
         return context
 
 
@@ -115,3 +118,38 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
         context['list_url'] = self.success_url
         context['action'] = 'add'
         return context
+
+
+@csrf_exempt
+def change_status(request):
+    data = {}
+    try:
+        if request.method == 'POST' and request.POST.get('action') == 'change_status':
+            parcel_id = request.POST.get('id')
+            current_status = request.POST.get('status')
+
+            # Get the package by id
+            parcel = Parcel.objects.get(pk=parcel_id)
+
+            # Change the state according to the current status
+            if current_status == 'pending':
+                parcel.status = 'in_transit'
+            elif current_status == 'in_transit':
+                parcel.status = 'ready_for_pickup'
+            elif current_status == 'ready_for_pickup':
+                parcel.status = 'delivered'
+            elif current_status == 'delivered':
+                parcel.status = 'cancelled'
+            elif current_status == 'cancelled':
+                parcel.status = 'pending'
+            
+            # Save the change to the database
+            parcel.save()
+
+            data['message'] = 'Estado cambiado correctamente.'
+        else:
+            data['error'] = 'Solicitud no válida.'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data)
+
