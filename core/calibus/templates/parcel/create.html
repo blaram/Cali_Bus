@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block content %}
-  <form method="POST">
+  <form id="parcel-form" method="POST">
     <div class="card card-primary">
       <div class="card-header">
         <h3 class="card-title">
@@ -25,7 +25,6 @@
           {% else %}
             <i class="fas fa-edit"></i>
           {% endif %}
-
           {{ title }}
         </h3>
       </div>
@@ -37,91 +36,90 @@
                 <h3 class="card-title"><i class="fas fa-clipboard"></i> Datos de Envío</h3>
               </div>
               <div class="card-body">
-                <input type="hidden" name="action" value="{{ action}}">
+                <input type="hidden" name="action" value="{{ action }}">
                 <div class="row">
-                  <div class="col-md-4">
+                  <div class="col-md-2">
                     <div class="form-group">
                       <label>Fecha:</label>
                       {{ form.date_joined }}
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <div class="form-group">
                       <label for="">Remitente:</label>
                       <div class="input-group">{{ form.senderID }}</div>
-                    </div>    
+                    </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <div class="form-group">
                       <label for="">Consignatario:</label>
                       <div class="input-group">{{ form.receiverID }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="">Bus y salida: </label>
+                      <div class="input-group">{{ form.travelID }}</div>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-4">
                     <div class="form-group">
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <div class="form-group">
-                            <label>Descripción:</label>
-                            {{ form.description }}
+                      <label>Descripción:</label>
+                      <textarea id="description" class="form-control" rows="3" placeholder="Descripción del artículo"></textarea>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>Cantidad:</label>
+                          <input type="number" id="quantity" class="form-control" placeholder="Cantidad">
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>Peso:</label>
+                          <div class="input-group">
+                            <input type="number" id="weight" class="form-control" placeholder="Peso en kg">
+                            <div class="input-group-append">
+                              <span class="input-group-text">Kg</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Peso:</label>
-                                <div class="input-group">
-                                  {{ form.weight }}
-                                  <div class="input-group-append">
-                                    <span class="input-group-text">Kg</span>
-                                  </div>
-                                </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>Valor declarado:</label>
+                          <div class="input-group">
+                            <input type="number" id="declared_value" class="form-control" placeholder="Valor declarado">
+                            <div class="input-group-append">
+                              <span class="input-group-text">Bs.</span>
                             </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Valor declarado:</label>
-                                <div class="input-group">
-                                  {{ form.declared_value }}
-                                  <div class="input-group-append">
-                                    <span class="input-group-text">Bs.</span>
-                                  </div>
-                                </div>
-                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <div class="form-group">
-                            <label>Costo de envio:</label>
-                            <div class="input-group">
-                              {{ form.shipping_cost }}
-                              <div class="input-group-append">
-                                <span class="input-group-text">Bs.</span>
-                              </div>
+                      <div class="col-sm-6">
+                        <div class="form-group">
+                          <label>Costo de envío:</label>
+                          <div class="input-group">
+                            <input type="number" id="shipping_cost" class="form-control" placeholder="Costo de envío">
+                            <div class="input-group-append">
+                              <span class="input-group-text">Bs.</span>
                             </div>
                           </div>
                         </div>
-                        <div class="col-sm-12">
-                          <div class="form-group">
-                            <label>Salidas:</label>
-                            <div class="input-group">
-                              {{ form.travelID }}
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-sm-12">
-                          <button type="button" class="btn btn-primary" id="add-to-table">Agregar a la tabla</button>
-                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary" id="add-to-table">Agregar a la tabla</button>
                       </div>
                     </div>
                   </div>
                   <div class="col-md-8">
-                    <label>Tabla de Encomiendas</label>
-                    <hr>
+                    <label>Detalle de Encomiendas</label>
                     <div class="table-responsive">
                       <table class="table table-bordered" id="tblParcels">
                         <thead>
@@ -131,16 +129,15 @@
                             <th class="text-center" style="width: 10%;">Peso (Kg)</th>
                             <th class="text-center" style="width: 15%;">Valor declarado (Bs.)</th>
                             <th class="text-center" style="width: 15%;">Costo de envío (Bs.)</th>
-                            <th style="width: 20%;">Salida</th>
                             <th class="text-center" style="width: 10%;">Acción</th>
                           </tr>
                         </thead>
                         <tbody></tbody>
                         <tfoot>
                           <tr>
-                              <th colspan="4" class="text-right">Total:</th>
-                              <th id="totalShippingCost">0.00</th>
-                              <th></th>
+                            <th colspan="4" class="text-right">Total:</th>
+                            <th id="totalShippingCost" class="text-center">0.00</th>
+                            <th></th>
                           </tr>
                         </tfoot>
                       </table>
@@ -151,7 +148,6 @@
             </div>
           </div>
         </div>
-
       </div>
       <div class="card-footer">
         {% block buttons_list %}

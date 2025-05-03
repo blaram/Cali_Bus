@@ -1,13 +1,5 @@
 $(function () {
-    function updateTotal() {
-        let total = 0;
-        $('#tblParcels tbody tr').each(function () {
-            const shippingCost = parseFloat($(this).find('td:eq(4)').text()) || 0;
-            total += shippingCost;
-        });
-        $('#totalShippingCost').text(total.toFixed(2));
-    }
-
+    // Inicializar Select2
     $('.select2').select2({
         theme: 'bootstrap4',
         language: 'es',
@@ -15,150 +7,151 @@ $(function () {
         allowClear: true
     });
 
+    // Inicializar datetimepicker
     $('#date_joined').datetimepicker({
         format: 'YYYY-MM-DD',
         date: moment().format('YYYY-MM-DD'),
         locale: 'es',
-        //maxDate: moment().format('YYYY-MM-DD'),
-        minDate: moment().format('YYYY-MM-DD'),
+        minDate: moment().format('YYYY-MM-DD')
     });
 
+    const tableBody = $('#tblParcels tbody');
+
+    // Función para limpiar los campos del formulario
+    function clearFields() {
+        $('#description').val('');
+        $('#quantity').val('');
+        $('#weight').val('');
+        $('#declared_value').val('');
+        $('#shipping_cost').val('');
+    }
+
+    // Función para calcular el total de la columna "Costo de envío"
+    function calculateTotal() {
+        let total = 0;
+
+        // Iterar sobre las filas de la tabla y sumar los valores de la columna "Costo de envío"
+        $('#tblParcels tbody tr').each(function () {
+            const shippingCost = parseFloat($(this).find('td:eq(4)').text()) || 0; // Columna 4: Costo de envío
+            total += shippingCost;
+        });
+
+        // Actualizar el total en el DOM
+        $('#totalShippingCost').text(total.toFixed(2)); // Mostrar con 2 decimales
+    }
+
+    // Agregar un artículo a la tabla
     $('#add-to-table').on('click', function () {
-        const description = $('[name="description"]').val();
-        const weight = $('[name="weight"]').val();
-        const declaredValue = $('[name="declared_value"]').val();
-        const shippingCost = $('[name="shipping_cost"]').val();
-        const travelText = $('[name="travelID"] option:selected').text(); // Captura el texto del viaje seleccionado
-        const senderID = $('[name="senderID"]').val(); // Captura el valor del remitente
-        const receiverID = $('[name="receiverID"]').val(); // Captura el valor del consignatario
+        const description = $('#description').val();
+        const quantity = $('#quantity').val();
+        const weight = $('#weight').val();
+        const declaredValue = $('#declared_value').val();
+        const shippingCost = $('#shipping_cost').val();
 
-        // Validar que los campos no estén en blanco o inválidos
-        if (!description || !senderID || !receiverID) {
-            alert('Por favor, complete todos los campos de texto antes de agregar a la tabla.');
-            return;
-        }
-
-        // Validar que los campos numéricos sean válidos y mayores a 0
-        if (isNaN(weight) || weight <= 0) {
-            alert('Por favor, ingrese un peso válido mayor a 0.');
-            return;
-        }
-        if (isNaN(declaredValue) || declaredValue <= 0) {
-            alert('Por favor, ingrese un valor declarado válido mayor a 0.');
-            return;
-        }
-        if (isNaN(shippingCost) || shippingCost <= 0) {
-            alert('Por favor, ingrese un costo de envío válido mayor a 0.');
-            return;
-        }
-
-        // Validar que travelText no sea vacío ni igual a "--------"
-        if (!travelText || travelText === '---------') {
-            alert('Por favor, seleccione una salida válida.');
-            return;
-        }
-
-        // Crear una nueva fila con íconos para las acciones
-        const newRow = `
-            <tr>
-                <td>1</td>
-                <td>${description}</td>
-                <td>${weight}</td>
-                <td>${declaredValue}</td>
-                <td>${shippingCost}</td>
-                <td>${travelText}</td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-warning btn-sm edit-row">
-                            <i class="fas fa-pencil-alt"></i> <!-- Ícono de lápiz -->
+        if (description && quantity && weight && declaredValue && shippingCost) {
+            const newRow = `
+                <tr>
+                    <td>${quantity}</td>
+                    <td>${description}</td>
+                    <td>${weight}</td>
+                    <td>${declaredValue}</td>
+                    <td>${shippingCost}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm edit-item">
+                            <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm delete-row">
-                            <i class="fas fa-trash"></i> <!-- Ícono de basura -->
+                        <button type="button" class="btn btn-danger btn-sm remove-item">
+                            <i class="fas fa-trash"></i>
                         </button>
-                    </div>
-                </td>
-            </tr>
-        `;
+                    </td>
+                </tr>
+            `;
+            tableBody.append(newRow);
 
-        // Agregar la fila al cuerpo de la tabla
-        $('#tblParcels tbody').append(newRow);
+            // Limpiar los campos
+            clearFields();
 
-        // Actualizar el total
-        updateTotal();
-
-        // Limpiar los campos del formulario
-        $('[name="description"]').val('');
-        $('[name="weight"]').val('0.0');
-        $('[name="declared_value"]').val('0.0');
-        $('[name="shipping_cost"]').val('0.0');
-        // $('[name="travelID"]').val(null).trigger('change'); // Limpia el campo de viaje
+            // Recalcular el total
+            calculateTotal();
+        } else {
+            alert('Por favor, complete todos los campos antes de agregar a la tabla.');
+        }
     });
 
-    // Eliminar una fila al hacer clic en el botón "Eliminar"
-    $('#tblParcels tbody').on('click', '.delete-row', function () {
+    // Eliminar un artículo de la tabla
+    tableBody.on('click', '.remove-item', function () {
         $(this).closest('tr').remove();
-        // Actualizar el total
-        updateTotal();
+
+        // Recalcular el total
+        calculateTotal();
     });
 
-    // Editar una fila al hacer clic en el botón "Editar"
-    $('#tblParcels tbody').on('click', '.edit-row', function () {
+    // Editar un artículo de la tabla
+    tableBody.on('click', '.edit-item', function () {
         const row = $(this).closest('tr');
+        const quantity = row.find('td:eq(0)').text();
         const description = row.find('td:eq(1)').text();
         const weight = row.find('td:eq(2)').text();
         const declaredValue = row.find('td:eq(3)').text();
         const shippingCost = row.find('td:eq(4)').text();
-        const travelText = row.find('td:eq(5)').text();
 
-        // Cargar los valores en el formulario
-        $('[name="description"]').val(description);
-        $('[name="weight"]').val(weight);
-        $('[name="declared_value"]').val(declaredValue);
-        $('[name="shipping_cost"]').val(shippingCost);
-        $('[name="travelID"] option').filter(function () {
-            return $(this).text() === travelText;
-        }).prop('selected', true).trigger('change');
+        // Cargar los valores en los campos del formulario
+        $('#quantity').val(quantity);
+        $('#description').val(description);
+        $('#weight').val(weight);
+        $('#declared_value').val(declaredValue);
+        $('#shipping_cost').val(shippingCost);
 
         // Eliminar la fila actual
         row.remove();
 
-        // Actualizar el total
-        updateTotal();
+        // Recalcular el total
+        calculateTotal();
     });
 
-    // event submit
+    // Manejar el evento submit del formulario
     $('form').on('submit', function (e) {
-        e.preventDefault();
-        var parameters = new FormData();
-        parameters.append('action', $('input[name="action"]').val());
+        e.preventDefault(); // Evitar el envío tradicional del formulario
 
-        // Capturar los datos de la tabla y agregarlos al FormData
-        const parcels = [];
+        const items = [];
+        let total = 0;
+
+        // Iterar sobre las filas de la tabla y calcular el total
         $('#tblParcels tbody tr').each(function () {
             const row = $(this);
-            const parcel = {
-                senderID: $('[name="senderID"]').val(), // ID del remitente
-                receiverID: $('[name="receiverID"]').val(), // ID del consignatario
-                travelID: $('[name="travelID"]').val(), // ID del viaje
-                date_joined: $('#date_joined').val(), // Fecha
-                description: row.find('td:eq(1)').text(), // Descripción
-                weight: parseFloat(row.find('td:eq(2)').text()), // Peso
-                declared_value: parseFloat(row.find('td:eq(3)').text()), // Valor declarado
-                shipping_cost: parseFloat(row.find('td:eq(4)').text()), // Costo de envío
-            };
-            parcels.push(parcel);
+            const shippingCost = parseFloat(row.find('td:eq(4)').text()) || 0; // Columna 4: Costo de envío
+            total += shippingCost; // Sumar el costo de envío total
+
+            items.push({
+                quantity: row.find('td:eq(0)').text(),
+                description: row.find('td:eq(1)').text(),
+                weight: row.find('td:eq(2)').text(),
+                declared_value: row.find('td:eq(3)').text(),
+                shipping_cost: row.find('td:eq(4)').text(),
+            });
         });
 
-        // Agregar los datos de las encomiendas al FormData como JSON
-        parameters.append('parcels', JSON.stringify(parcels));
+        const parcelData = {
+            action: $('input[name="action"]').val(),
+            senderID: $('[name="senderID"]').val(),
+            receiverID: $('[name="receiverID"]').val(),
+            travelID: $('[name="travelID"]').val(),
+            date_joined: $('#date_joined').val(),
+            total: total.toFixed(2),
+            items: items,
+        };
 
+        // Imprimir los datos en la consola
+        console.log('Datos enviados:', parcelData);
+
+        // Usar submit_with_ajax para enviar los datos
         submit_with_ajax(
-            window.location.pathname,
-            'Notificación',
-            '¿Estas seguro de realizar la siguiente acción?',
-            parameters,
+            window.location.pathname, // URL actual
+            'Notificación', // Título de la confirmación
+            '¿Estás seguro de realizar esta acción?', // Mensaje de confirmación
+            JSON.stringify(parcelData), // Datos a enviar
             function () {
-                location.href = '/calibus/dashboard/';
+                window.location.href = '/calibus/parcel/list/'; // Redirigir después de éxito
             }
         );
     });

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.forms import *
 
-from core.calibus.models import Route, Travel, Client, Parcel, Bus
+from core.calibus.models import Route, Travel, Client, Parcel, Bus, ParcelItem
 
 
 class RouteForm(ModelForm):
@@ -193,12 +193,12 @@ class ParcelForm(ModelForm):
             'readonly': True,
         }
 
-        self.fields['description'].widget.attrs = {
-            'autocomplete': 'off',
-            'class': 'form-control',
-            'rows': '3',
-            'placeholder': 'Escribe aquí la descripción del paquete',
-        }
+        # self.fields['description'].widget.attrs = {
+        #    'autocomplete': 'off',
+        #    'class': 'form-control',
+        #    'rows': '3',
+        #    'placeholder': 'Escribe aquí la descripción del paquete',
+        # }
 
         # Personalización del campo travelID
         self.fields['travelID'].queryset = Travel.objects.filter(status=True)  # Solo viajes activos
@@ -225,6 +225,34 @@ class ParcelForm(ModelForm):
             ),
         }
 
+
+class ParcelItemForm(ModelForm):
+    class Meta:
+        model = ParcelItem
+        fields = ['description', 'quantity', 'weight', 'declared_value', 'shipping_cost']
+        widgets = {
+            'description': Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Descripción del artículo',
+            }),
+            'quantity': NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Cantidad',
+            }),
+            'weight': NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Peso en kg',
+            }),
+            'declared_value': NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Valor declarado',
+            }),
+            'shipping_cost': NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Costo de envío',
+            }),
+        }
 
 class BusForm(ModelForm):
     def __init__(self, *args, **kwargs):

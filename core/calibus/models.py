@@ -5,7 +5,7 @@ from datetime import datetime
 from django.forms import model_to_dict
 
 from config.settings import MEDIA_URL, STATIC_URL
-from core.calibus.choices import gender_choices
+from core.calibus.choices import gender_choices, parcel_choices
 from core.models import BaseModel
 
 # Define una función para obtener la hora actual
@@ -117,7 +117,7 @@ class Travel(models.Model):
     status = models.BooleanField(default=True, verbose_name='Estado')
 
     def __str__(self):
-        return f"{self.routeID.origin} -> {self.routeID.destination} ({self.departure} {self.departure_time})"
+        return f"({self.departure} - {self.departure_time}) {self.busID.license_plate} -> {self.routeID.destination}"
         
     def toJSON(self):
         item = model_to_dict(self)
@@ -138,15 +138,8 @@ class Parcel(models.Model):
         Client, on_delete=models.CASCADE, related_name='received_parcels')
     travelID = models.ForeignKey(Travel, on_delete=models.CASCADE)
     date_joined = models.DateField(default=datetime.now)
-    description = models.TextField(
-        null=True, blank=True, verbose_name='Descripción')
-    weight = models.DecimalField(
-        default=0.00, max_digits=9, decimal_places=2, verbose_name='Peso')
-    declared_value = models.DecimalField(
-        default=0.00, max_digits=9, decimal_places=2, verbose_name='Valor declarado')
-    shipping_cost = models.DecimalField(
-        default=0.00, max_digits=9, decimal_places=2, verbose_name='Costo de envío')
-    status = models.BooleanField(default=True, verbose_name='Estado')
+    status = models.CharField(max_length=30, choices=parcel_choices, default='pending', verbose_name='Estado', blank=True)
+    total = models.DecimalField(default=0.00, max_digits=10, decimal_places=2, verbose_name='Total Precio de Envío')
 
     def __str__(self):
         return self.senderID.names
@@ -167,6 +160,29 @@ class Parcel(models.Model):
         verbose_name_plural = 'Encomiendas'
         ordering = ['id']
 
+
+class ParcelItem(models.Model):
+    parcelID = models.ForeignKey(Parcel, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1, verbose_name='Cantidad')
+    description = models.TextField( null=True, blank=True, verbose_name='Descripción')
+    weight = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Peso')
+    declared_value = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Valor declarado')
+    shipping_cost = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Costo de envío')
+
+    def __str__(self):
+        return f"Encomienda ID: {self.parcelID.id}, Cantidad: {self.quantity}, Descripción: {self.description or 'Sin descripción'}"
+    
+    def toJSON(self):
+        data = model_to_dict(self)
+        data['parcelID'] = self.parcelID.id # Solo incluye el ID de la encomienda
+        data['description'] = self.description or 'Sin descripción'
+        return data
+    
+    class Meta:
+        db_table = 'DetallesEncomiendas'
+        verbose_name = 'Detalle de Encomienda'
+        verbose_name_plural = 'Deatlle de Encomiendas'
+        ordering = ['id']
 
 class ReceiptDetail(models.Model):
     parc = models.ForeignKey(Parcel, on_delete=models.CASCADE)
