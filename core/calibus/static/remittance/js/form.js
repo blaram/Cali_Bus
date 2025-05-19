@@ -41,11 +41,17 @@ $(function () {
     // event submit
     $('form').on('submit', function (e) {
         e.preventDefault();
-        var parameters = new FormData(this);
-        // Mostrar el contenido en la consola
-        for (var pair of parameters.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
+        var amount = parseFloat($('#id_amount_to_send').val()) || 0;
+        if (amount <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Monto inválido',
+                text: 'El monto a enviar debe ser mayor a 0.',
+            });
+            $('#id_amount_to_send').focus();
+            return false;
         }
+        var parameters = new FormData(this);
         submit_with_ajax(
             window.location.pathname,
             'Notificación',
