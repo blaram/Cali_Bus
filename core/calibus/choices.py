@@ -9,3 +9,9 @@ parcel_choices = (
     ('delivered', 'Entregado'),  # El paquete fue entregado al destinatario.
     ('cancelled', 'Cancelado'),  # El envío fue anulado antes de llegar a destino.
 )
+remittance_choices =(
+    ('pending', 'Pendiente'),  # La remesa está registrada pero aún no ha sido despachada.
+    ('sent', 'Enviado'),  # La remesa está siendo transportada hacia su destino.
+    ('delivered', 'Entregado'),  # La remesa fue entregada al destinatario.
+    ('cancelled', 'Cancelado'),  # La remesa fue anulada antes de llegar a destino.
+)
