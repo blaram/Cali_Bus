@@ -252,9 +252,19 @@ class Remittance(models.Model):
     )
 
     def __str__(self):
-        return (
-            f"Giro de {self.senderID.names} a {self.receiverID.names} por {self.amount}"
+        return f"Giro de {self.senderID.names} a {self.receiverID.names} por {self.amount_to_send}"
+
+    def toJSON(self):
+        data = model_to_dict(self)
+        data["senderID"] = (
+            f"{self.senderID.names} {self.senderID.surnames}"  # Combina nombres y apellidos
         )
+        data["receiverID"] = f"{self.receiverID.names} {self.receiverID.surnames}"
+        data["transaction_date"] = self.transaction_date.strftime("%Y-%m-%d")
+        data["delivery_date"] = (
+            self.delivery_date.strftime("%Y-%m-%d") if self.delivery_date else None
+        )
+        return data
 
     class Meta:
         db_table = "Giros"

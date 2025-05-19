@@ -58,7 +58,7 @@ $(function () {
             '¿Estas seguro de realizar la siguiente acción?',
             parameters,
             function () {
-                location.href = '/calibus/dashboard/';
+                location.href = '/calibus/remittance/list/';
             }
         );
     });

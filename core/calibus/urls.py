@@ -5,8 +5,8 @@ from core.calibus.views.dashboard.views import *
 from core.calibus.views.travel.views import *
 from core.calibus.views.parcel.views import *
 from core.calibus.views.bus.views import *
+from core.calibus.views.remittance.views import *
 from core.calibus.views.tests.views import TestView
-from core.calibus.views.remittance.views import RemittanceCreateView
 
 app_name = "calibus"
 
@@ -40,5 +40,6 @@ urlpatterns = [
     path("bus/update/<int:pk>/", BusUpdateView.as_view(), name="bus_update"),
     path("bus/delete/<int:pk>/", BusDeleteView.as_view(), name="bus_delete"),
     # remittance
+    path("remittance/list/", RemittanceListView.as_view(), name="remittance_list"),
     path("remittance/add/", RemittanceCreateView.as_view(), name="remittance_create"),
 ]
