@@ -379,28 +379,29 @@ class RemittanceForm(ModelForm):
             ),
             "amount_to_send": NumberInput(
                 attrs={
-                    "class": "form-control",
+                    "class": "form-control text-right",
                     "placeholder": "Ingrese el monto a enviar",
                 }
             ),
             "commission_percentage": NumberInput(
                 attrs={
                     "readonly": True,
-                    "class": "form-control",
+                    "class": "form-control text-right",
                     "placeholder": "Ingrese el porcentaje de comisión",
+                    "value": 10,
                 }
             ),
             "commission_amount": NumberInput(
                 attrs={
                     "readonly": True,
-                    "class": "form-control",
+                    "class": "form-control text-right",
                     "placeholder": "Ingrese el monto de comisión",
                 }
             ),
             "total_amount": NumberInput(
                 attrs={
                     "readonly": True,
-                    "class": "form-control",
+                    "class": "form-control text-right",
                     "placeholder": "Ingrese el monto total",
                 }
             ),

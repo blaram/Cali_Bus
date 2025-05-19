@@ -2,6 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from core.calibus.models import Remittance
@@ -18,6 +20,7 @@ class RemittanceCreateView(
     permission_required = "calibus.add_remittance"
     url_redirect = success_url
 
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
@@ -27,7 +30,14 @@ class RemittanceCreateView(
             action = request.POST["action"]
             if action == "add":
                 form = self.get_form()
-                data = form.save()
+                if form.is_valid():
+                    instance = form.save()
+                    data["success"] = "Remesa guardada correctamente"
+                    data["id"] = (
+                        instance.id
+                    )  # puedes devolver el id u otros datos si quieres
+                else:
+                    data["error"] = form.errors.as_json()
             else:
                 data["error"] = "No ha ingresado a ninguna opción"
         except Exception as e:

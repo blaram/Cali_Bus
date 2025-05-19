@@ -222,7 +222,7 @@ class Remittance(models.Model):
         default=0.00, max_digits=9, decimal_places=2, verbose_name="Monto a enviar"
     )
     commission_percentage = models.DecimalField(
-        default=0.00,
+        default=10,
         max_digits=9,
         decimal_places=2,
         verbose_name="Potcentaje de Comisión",
