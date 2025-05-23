@@ -273,6 +273,69 @@ class Remittance(models.Model):
         ordering = ["id"]
 
 
+class Ticket(models.Model):
+    clientID = models.ForeignKey(Client, on_delete=models.CASCADE)
+    travelID = models.ForeignKey(Travel, on_delete=models.CASCADE)
+    purchase_date = models.DateField(
+        default=datetime.now, verbose_name="Fecha de compra"
+    )
+    purchase_time = models.TimeField(
+        default=current_time, verbose_name="Hora de compra"
+    )
+    ticket_type = models.CharField()
+    total_price = models.DecimalField(
+        default=0.00, max_digits=9, decimal_palces=2, verbose_name="Precio total"
+    )
+    status = models.BooleanField(default=True, verbose_name="Estado")
+
+    def __str__(self):
+        return f"Ticket de {self.clientID.names} para el viaje {self.travelID.id}"
+
+    def toJSON(self):
+        data = model_to_dict(self)
+        data["clientID"] = (
+            f"{self.clientID.names} {self.clientID.surnames}"  # Combina nombres y apellidos
+        )
+        data["travelID"] = (
+            f"{self.travelID.routeID.origin} -> {self.travelID.routeID.destination} ({self.travelID.departure} {self.travelID.departure_time})"
+        )
+        return data
+
+    class Meta:
+        db_table = "Pasajes"
+        verbose_name = "Pasaje"
+        verbose_name_plural = "Pasajes"
+        ordering = ["id"]
+
+
+class TicketDetail(models.Model):
+    ticketID = models.ForeignKey(Ticket, ondelete=models.CASCADE)
+    seat_number = models.IntegerField(default=0, verbose_name="Número de asiento")
+    passengerID = models.ForeignKey(
+        Client, on_delete=models.CASCADE, verbose_name="Pasajero"
+    )
+    price = models.DecimalField(
+        default=0.00, max_digits=9, decimal_places=2, verbose_name="Precio"
+    )
+
+    def __str__(self):
+        return f"Pasajero: {self.passengerID.names}, Asiento: {self.seat_number}"
+
+    def toJSON(self):
+        data = model_to_dict(self)
+        data["ticketID"] = self.ticketID.id
+        data["passengerID"] = (
+            f"{self.passengerID.names} {self.passengerID.surnames}"  # Combina nombres y apellidos
+        )
+        return data
+
+    class Meta:
+        db_table = "DetallesPasajes"
+        verbose_name = "Detalle de Pasaje"
+        verbose_name_plural = "Detalle de Pasajes"
+        ordering = ["id"]
+
+
 class ReceiptDetail(models.Model):
     parc = models.ForeignKey(Parcel, on_delete=models.CASCADE)
     mount = models.DecimalField(
