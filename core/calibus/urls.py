@@ -7,6 +7,7 @@ from core.calibus.views.parcel.views import *
 from core.calibus.views.bus.views import *
 from core.calibus.views.remittance.views import *
 from core.calibus.views.tests.views import TestView
+from core.calibus.views.ticket.views import *
 
 app_name = "calibus"
 
@@ -42,4 +43,6 @@ urlpatterns = [
     # remittance
     path("remittance/list/", RemittanceListView.as_view(), name="remittance_list"),
     path("remittance/add/", RemittanceCreateView.as_view(), name="remittance_create"),
+    # ticket
+    path("ticket/add/", TicketCreateView.as_view(), name="ticket_create"),
 ]

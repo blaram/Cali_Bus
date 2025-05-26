@@ -1,0 +1,563 @@
+{% extends "list.html" %}
+{% load static %}
+
+{% block head_list %}
+  <link href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet" />
+  <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>
+  <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>
+
+  <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>
+  <script src="{% static 'lib/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.js' %}"></script>
+  <link href="{% static 'lib/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.css' %}" rel="stylesheet" />
+
+  <link href="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.css' %}" rel="stylesheet" />
+  <script src="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.js' %}"></script>
+
+  <!-- Functions -->
+  <script src="{% static 'js/functions.js' %}"></script>
+  <script src="{% static 'tickets/js/form.js' %}"></script>
+  
+  <style>
+    .seat-layout {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 20px;
+      min-height: 600px;
+    }
+    
+    .bus-container {
+      max-width: 300px;
+      margin: 0 auto;
+      background: white;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .bus-front {
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    
+    .seat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    
+    .seat {
+      width: 35px;
+      height: 35px;
+      border: 2px solid #6c757d;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .seat.available {
+      background: #28a745;
+      color: white;
+      border-color: #28a745;
+    }
+    .seat.available:hover {
+      background: #218838;
+    }
+    
+    .seat.occupied {
+      background: #dc3545;
+      color: white;
+      border-color: #dc3545;
+      cursor: not-allowed;
+    }
+    
+    .seat.selected {
+      background: #ffc107;
+      color: #212529;
+      border-color: #ffc107;
+      box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+    
+    .seat.reserved {
+      background: #6f42c1;
+      color: white;
+      border-color: #6f42c1;
+      cursor: not-allowed;
+    }
+    
+    .aisle {
+      width: 20px;
+    }
+    
+    .legend {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 5px;
+    }
+    
+    .legend-seat {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      margin-right: 5px;
+    }
+    
+    .passenger-form {
+      display: none;
+      margin-top: 10px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .selected-seats-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .seat-info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      margin: 5px 0;
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 3px;
+    }
+    
+    .remove-seat {
+      color: #dc3545;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .remove-seat:hover {
+      color: #c82333;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <form method="POST" id="ticketForm">
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title">
+          {% if action == 'add' %}
+              <i class="fas fa-plus"></i>
+          {% else %}
+              <i class="fas fa-edit"></i>
+          {% endif %}
+          {{ title }}
+        </h3>
+      </div>
+      <div class="card-body">
+        <!-- Primera fila: Información del viaje -->
+        <div class="card card-default">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-route"></i> Información del Viaje
+            </h3>
+          </div>
+          <div class="card-body">
+            <input type="hidden" name="action" value="{{ action }}">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Fecha de compra:</label>
+                  {{ form.purchase_date }}
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Viaje:</label>
+                  <div class="input-group">{{ form.travelID }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Cliente:</label>
+                  <div class="input-group">{{ form.clientID }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Tipo de ticket:</label>
+                  <div class="input-group">{{ form.ticket_type }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segunda fila: Layout principal con asientos y detalles -->
+        <div class="row">
+          <!-- Columna izquierda: Asientos del bus -->
+          <div class="col-md-6">
+            <div class="card card-default">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-bus"></i> Selección de Asientos
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="seat-layout">
+                  <div class="bus-container">
+                    <div class="bus-front">
+                      <i class="fas fa-steering-wheel"></i> CONDUCTOR
+                    </div>
+                    
+                    <!-- Generar asientos dinámicamente -->
+                    <div id="seatMap">
+                      <!-- Los asientos se generarán con JavaScript -->
+                    </div>
+                    
+                    <div class="legend">
+                      <div class="legend-item">
+                        <div class="legend-seat available"></div>
+                        <small>Disponible</small>
+                      </div>
+                      <div class="legend-item">
+                        <div class="legend-seat occupied"></div>
+                        <small>Ocupado</small>
+                      </div>
+                      <div class="legend-item">
+                        <div class="legend-seat selected"></div>
+                        <small>Seleccionado</small>
+                      </div>
+                      <div class="legend-item">
+                        <div class="legend-seat reserved"></div>
+                        <small>Reservado</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna derecha: Detalles del ticket -->
+          <div class="col-md-6">
+            <div class="card card-default">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-ticket-alt"></i> Detalles del Pasaje
+                </h3>
+              </div>
+              <div class="card-body">
+                <!-- Asientos seleccionados -->
+                <div class="form-group">
+                  <label>Asientos Seleccionados:</label>
+                  <div id="selectedSeatsList" class="selected-seats-list">
+                    <div class="text-muted text-center p-3">
+                      <i class="fas fa-hand-pointer fa-2x"></i>
+                      <p class="mt-2">Selecciona asientos en el mapa del bus</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Información de precios -->
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Cantidad de asientos:</label>
+                      <input type="text" id="seatCount" class="form-control" readonly value="0">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Precio por asiento:</label>
+                      <div class="input-group">
+                        <input type="text" id="seatPrice" class="form-control" readonly value="0.00">
+                        <div class="input-group-append">
+                          <span class="input-group-text">Bs</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label>Precio Total:</label>
+                      <div class="input-group">
+                        {{ form.total_price }}
+                        <div class="input-group-append">
+                          <span class="input-group-text">Bs</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Formulario para agregar pasajeros -->
+                <div id="passengerForms"></div>
+                
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle"></i>
+                  <strong>Instrucciones:</strong>
+                  <ul class="mb-0 mt-2">
+                    <li>Haz clic en los asientos disponibles (verdes) para seleccionarlos</li>
+                    <li>Los asientos ocupados (rojos) no se pueden seleccionar</li>
+                    <li>Los asientos reservados (morados) no están disponibles</li>
+                    <li>Completa la información del pasajero para cada asiento</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <button type="submit" class="btn btn-primary btn-flat" id="submitBtn" disabled>
+          <i class="fas fa-ticket-alt"></i> Vender Pasajes
+        </button>
+        <button type="button" class="btn btn-warning btn-flat" id="reserveBtn" disabled>
+          <i class="fas fa-bookmark"></i> Reservar Asientos
+        </button>
+        <a href="{{ list_url }}" class="btn btn-success btn-flat">
+          <i class="fas fa-sync"></i> Actualizar
+        </a>
+        <button type="button" class="btn btn-secondary btn-flat" id="clearSelection">
+          <i class="fas fa-eraser"></i> Limpiar Selección
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    $(document).ready(function() {
+      let selectedSeats = [];
+      let seatPrice = 50.00; // Precio por defecto, debería venir del backend
+      let occupiedSeats = [2, 5, 8, 12]; // Asientos ocupados, debería venir del backend
+      let reservedSeats = [15, 20]; // Asientos reservados, debería venir del backend
+      
+      // Inicializar Select2
+      $('.select2').select2({
+        theme: 'bootstrap4',
+        language: 'es'
+      });
+      
+      // Generar mapa de asientos
+      generateSeatMap();
+      
+      function generateSeatMap() {
+        const seatMap = $('#seatMap');
+        const totalSeats = 45; // Total de asientos del bus
+        let html = '';
+        
+        for (let i = 1; i <= totalSeats; i++) {
+          if ((i - 1) % 4 === 0) {
+            html += '<div class="seat-row">';
+          }
+          
+          let seatClass = 'available';
+          if (occupiedSeats.includes(i)) {
+            seatClass = 'occupied';
+          } else if (reservedSeats.includes(i)) {
+            seatClass = 'reserved';
+          }
+          
+          html += `<div class="seat ${seatClass}" data-seat="${i}">${i}</div>`;
+          
+          // Agregar pasillo después del segundo asiento de cada fila
+          if ((i - 1) % 4 === 1) {
+            html += '<div class="aisle"></div>';
+          }
+          
+          if (i % 4 === 0) {
+            html += '</div>';
+          }
+        }
+        
+        seatMap.html(html);
+        
+        // Agregar event listeners a los asientos
+        $('.seat.available').click(function() {
+          const seatNumber = parseInt($(this).data('seat'));
+          toggleSeat(seatNumber, $(this));
+        });
+      }
+      
+      function toggleSeat(seatNumber, element) {
+        const index = selectedSeats.indexOf(seatNumber);
+        
+        if (index > -1) {
+          // Deseleccionar asiento
+          selectedSeats.splice(index, 1);
+          element.removeClass('selected').addClass('available');
+          removePassengerForm(seatNumber);
+        } else {
+          // Seleccionar asiento
+          selectedSeats.push(seatNumber);
+          element.removeClass('available').addClass('selected');
+          addPassengerForm(seatNumber);
+        }
+        
+        updateSelectedSeatsList();
+        updateTotalPrice();
+        updateButtons();
+      }
+      
+      function addPassengerForm(seatNumber) {
+        const formHtml = `
+          <div class="passenger-form" id="passengerForm${seatNumber}">
+            <h6><i class="fas fa-user"></i> Pasajero para asiento ${seatNumber}</h6>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Pasajero:</label>
+                  <select name="passenger_${seatNumber}" class="form-control select2" required>
+                    <option value="">Seleccionar pasajero...</option>
+                    <!-- Opciones de pasajeros desde el backend -->
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Precio:</label>
+                  <div class="input-group">
+                    <input type="number" name="price_${seatNumber}" class="form-control" value="${seatPrice}" step="0.01" min="0">
+                    <div class="input-group-append">
+                      <span class="input-group-text">Bs</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        $('#passengerForms').append(formHtml);
+        $(`#passengerForm${seatNumber}`).slideDown();
+        $(`#passengerForm${seatNumber} .select2`).select2({
+          theme: 'bootstrap4',
+          language: 'es'
+        });
+      }
+      
+      function removePassengerForm(seatNumber) {
+        $(`#passengerForm${seatNumber}`).slideUp(function() {
+          $(this).remove();
+        });
+      }
+      
+      function updateSelectedSeatsList() {
+        const listContainer = $('#selectedSeatsList');
+        
+        if (selectedSeats.length === 0) {
+          listContainer.html(`
+            <div class="text-muted text-center p-3">
+              <i class="fas fa-hand-pointer fa-2x"></i>
+              <p class="mt-2">Selecciona asientos en el mapa del bus</p>
+            </div>
+          `);
+          return;
+        }
+        
+        let html = '';
+        selectedSeats.sort((a, b) => a - b).forEach(seat => {
+          html += `
+            <div class="seat-info-item">
+              <span><i class="fas fa-chair"></i> Asiento ${seat}</span>
+              <span class="remove-seat" onclick="removeSeat(${seat})">&times;</span>
+            </div>
+          `;
+        });
+        
+        listContainer.html(html);
+      }
+      
+      window.removeSeat = function(seatNumber) {
+        $(`.seat[data-seat="${seatNumber}"]`).click();
+      }
+      
+      function updateTotalPrice() {
+        const total = selectedSeats.length * seatPrice;
+        $('#seatCount').val(selectedSeats.length);
+        $('#seatPrice').val(seatPrice.toFixed(2));
+        $('#id_total_price').val(total.toFixed(2));
+      }
+      
+      function updateButtons() {
+        const hasSelection = selectedSeats.length > 0;
+        $('#submitBtn, #reserveBtn').prop('disabled', !hasSelection);
+      }
+      
+      // Limpiar selección
+      $('#clearSelection').click(function() {
+        selectedSeats.forEach(seat => {
+          $(`.seat[data-seat="${seat}"]`).removeClass('selected').addClass('available');
+        });
+        selectedSeats = [];
+        $('#passengerForms').empty();
+        updateSelectedSeatsList();
+        updateTotalPrice();
+        updateButtons();
+      });
+      
+      // Validación del formulario
+      $('#ticketForm').submit(function(e) {
+        if (selectedSeats.length === 0) {
+          e.preventDefault();
+          alert('Debe seleccionar al menos un asiento');
+          return false;
+        }
+        
+        // Validar que todos los pasajeros estén seleccionados
+        let valid = true;
+        selectedSeats.forEach(seat => {
+          if (!$(`select[name="passenger_${seat}"]`).val()) {
+            valid = false;
+            $(`select[name="passenger_${seat}"]`).addClass('is-invalid');
+          } else {
+            $(`select[name="passenger_${seat}"]`).removeClass('is-invalid');
+          }
+        });
+        
+        if (!valid) {
+          e.preventDefault();
+          alert('Debe seleccionar un pasajero para cada asiento');
+          return false;
+        }
+        
+        // Agregar datos de asientos seleccionados al formulario
+        selectedSeats.forEach(seat => {
+          $('<input>').attr({
+            type: 'hidden',
+            name: 'selected_seats',
+            value: seat
+          }).appendTo('#ticketForm');
+        });
+      });
+      
+      // Inicializar valores
+      updateTotalPrice();
+      updateButtons();
+    });
+  </script>
+{% endblock %}

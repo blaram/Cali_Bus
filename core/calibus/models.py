@@ -284,7 +284,7 @@ class Ticket(models.Model):
     )
     ticket_type = models.CharField()
     total_price = models.DecimalField(
-        default=0.00, max_digits=9, decimal_palces=2, verbose_name="Precio total"
+        default=0.00, max_digits=9, decimal_places=2, verbose_name="Precio total"
     )
     status = models.BooleanField(default=True, verbose_name="Estado")
 
@@ -309,7 +309,7 @@ class Ticket(models.Model):
 
 
 class TicketDetail(models.Model):
-    ticketID = models.ForeignKey(Ticket, ondelete=models.CASCADE)
+    ticketID = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     seat_number = models.IntegerField(default=0, verbose_name="Número de asiento")
     passengerID = models.ForeignKey(
         Client, on_delete=models.CASCADE, verbose_name="Pasajero"

@@ -10,6 +10,7 @@ from core.calibus.models import (
     Bus,
     ParcelItem,
     Remittance,
+    Ticket,
 )
 
 
@@ -404,5 +405,40 @@ class RemittanceForm(ModelForm):
                     "class": "form-control text-right",
                     "placeholder": "Ingrese el monto total",
                 }
+            ),
+        }
+
+
+class TicketForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for form in self.visible_fields():
+            form.field.widget.attrs["class"] = "form-control"
+            form.field.widget.attrs["autocomplete"] = "off"
+        self.fields["clientID"].widget.attrs["autofocus"] = True
+
+    class Meta:
+        model = Ticket
+        fields = "__all__"
+        widgets = {
+            "clientID": Select(
+                attrs={
+                    "class": "form-control select2",
+                    "style": "width: 100%",
+                    "placeholder": "Ingrese sus nombres",
+                }
+            ),
+            "travelID": Select(
+                attrs={
+                    "class": "form-control select2",
+                    "style": "width: 100%",
+                    "placeholder": "Ingrese su viaje",
+                }
+            ),
+            "purchase_date": DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "value": datetime.now().strftime("%Y-%m-%d"),
+                },
             ),
         }
