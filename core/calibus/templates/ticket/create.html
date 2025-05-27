@@ -16,7 +16,8 @@
 
   <!-- Functions -->
   <script src="{% static 'js/functions.js' %}"></script>
-  <script src="{% static 'tickets/js/form.js' %}"></script>
+  <script src="{% static 'ticket/js/create.js' %}"></script>
+
   
   <style>
     .seat-layout {
@@ -226,12 +227,10 @@
                     <div class="bus-front">
                       <i class="fas fa-steering-wheel"></i> CONDUCTOR
                     </div>
-                    
                     <!-- Generar asientos dinámicamente -->
                     <div id="seatMap">
                       <!-- Los asientos se generarán con JavaScript -->
                     </div>
-                    
                     <div class="legend">
                       <div class="legend-item">
                         <div class="legend-seat available"></div>
@@ -346,218 +345,8 @@
       </div>
     </div>
   </form>
-
   <script>
-    $(document).ready(function() {
-      let selectedSeats = [];
-      let seatPrice = 50.00; // Precio por defecto, debería venir del backend
-      let occupiedSeats = [2, 5, 8, 12]; // Asientos ocupados, debería venir del backend
-      let reservedSeats = [15, 20]; // Asientos reservados, debería venir del backend
-      
-      // Inicializar Select2
-      $('.select2').select2({
-        theme: 'bootstrap4',
-        language: 'es'
-      });
-      
-      // Generar mapa de asientos
-      generateSeatMap();
-      
-      function generateSeatMap() {
-        const seatMap = $('#seatMap');
-        const totalSeats = 45; // Total de asientos del bus
-        let html = '';
-        
-        for (let i = 1; i <= totalSeats; i++) {
-          if ((i - 1) % 4 === 0) {
-            html += '<div class="seat-row">';
-          }
-          
-          let seatClass = 'available';
-          if (occupiedSeats.includes(i)) {
-            seatClass = 'occupied';
-          } else if (reservedSeats.includes(i)) {
-            seatClass = 'reserved';
-          }
-          
-          html += `<div class="seat ${seatClass}" data-seat="${i}">${i}</div>`;
-          
-          // Agregar pasillo después del segundo asiento de cada fila
-          if ((i - 1) % 4 === 1) {
-            html += '<div class="aisle"></div>';
-          }
-          
-          if (i % 4 === 0) {
-            html += '</div>';
-          }
-        }
-        
-        seatMap.html(html);
-        
-        // Agregar event listeners a los asientos
-        $('.seat.available').click(function() {
-          const seatNumber = parseInt($(this).data('seat'));
-          toggleSeat(seatNumber, $(this));
-        });
-      }
-      
-      function toggleSeat(seatNumber, element) {
-        const index = selectedSeats.indexOf(seatNumber);
-        
-        if (index > -1) {
-          // Deseleccionar asiento
-          selectedSeats.splice(index, 1);
-          element.removeClass('selected').addClass('available');
-          removePassengerForm(seatNumber);
-        } else {
-          // Seleccionar asiento
-          selectedSeats.push(seatNumber);
-          element.removeClass('available').addClass('selected');
-          addPassengerForm(seatNumber);
-        }
-        
-        updateSelectedSeatsList();
-        updateTotalPrice();
-        updateButtons();
-      }
-      
-      function addPassengerForm(seatNumber) {
-        const formHtml = `
-          <div class="passenger-form" id="passengerForm${seatNumber}">
-            <h6><i class="fas fa-user"></i> Pasajero para asiento ${seatNumber}</h6>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label>Pasajero:</label>
-                  <select name="passenger_${seatNumber}" class="form-control select2" required>
-                    <option value="">Seleccionar pasajero...</option>
-                    <!-- Opciones de pasajeros desde el backend -->
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label>Precio:</label>
-                  <div class="input-group">
-                    <input type="number" name="price_${seatNumber}" class="form-control" value="${seatPrice}" step="0.01" min="0">
-                    <div class="input-group-append">
-                      <span class="input-group-text">Bs</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-        
-        $('#passengerForms').append(formHtml);
-        $(`#passengerForm${seatNumber}`).slideDown();
-        $(`#passengerForm${seatNumber} .select2`).select2({
-          theme: 'bootstrap4',
-          language: 'es'
-        });
-      }
-      
-      function removePassengerForm(seatNumber) {
-        $(`#passengerForm${seatNumber}`).slideUp(function() {
-          $(this).remove();
-        });
-      }
-      
-      function updateSelectedSeatsList() {
-        const listContainer = $('#selectedSeatsList');
-        
-        if (selectedSeats.length === 0) {
-          listContainer.html(`
-            <div class="text-muted text-center p-3">
-              <i class="fas fa-hand-pointer fa-2x"></i>
-              <p class="mt-2">Selecciona asientos en el mapa del bus</p>
-            </div>
-          `);
-          return;
-        }
-        
-        let html = '';
-        selectedSeats.sort((a, b) => a - b).forEach(seat => {
-          html += `
-            <div class="seat-info-item">
-              <span><i class="fas fa-chair"></i> Asiento ${seat}</span>
-              <span class="remove-seat" onclick="removeSeat(${seat})">&times;</span>
-            </div>
-          `;
-        });
-        
-        listContainer.html(html);
-      }
-      
-      window.removeSeat = function(seatNumber) {
-        $(`.seat[data-seat="${seatNumber}"]`).click();
-      }
-      
-      function updateTotalPrice() {
-        const total = selectedSeats.length * seatPrice;
-        $('#seatCount').val(selectedSeats.length);
-        $('#seatPrice').val(seatPrice.toFixed(2));
-        $('#id_total_price').val(total.toFixed(2));
-      }
-      
-      function updateButtons() {
-        const hasSelection = selectedSeats.length > 0;
-        $('#submitBtn, #reserveBtn').prop('disabled', !hasSelection);
-      }
-      
-      // Limpiar selección
-      $('#clearSelection').click(function() {
-        selectedSeats.forEach(seat => {
-          $(`.seat[data-seat="${seat}"]`).removeClass('selected').addClass('available');
-        });
-        selectedSeats = [];
-        $('#passengerForms').empty();
-        updateSelectedSeatsList();
-        updateTotalPrice();
-        updateButtons();
-      });
-      
-      // Validación del formulario
-      $('#ticketForm').submit(function(e) {
-        if (selectedSeats.length === 0) {
-          e.preventDefault();
-          alert('Debe seleccionar al menos un asiento');
-          return false;
-        }
-        
-        // Validar que todos los pasajeros estén seleccionados
-        let valid = true;
-        selectedSeats.forEach(seat => {
-          if (!$(`select[name="passenger_${seat}"]`).val()) {
-            valid = false;
-            $(`select[name="passenger_${seat}"]`).addClass('is-invalid');
-          } else {
-            $(`select[name="passenger_${seat}"]`).removeClass('is-invalid');
-          }
-        });
-        
-        if (!valid) {
-          e.preventDefault();
-          alert('Debe seleccionar un pasajero para cada asiento');
-          return false;
-        }
-        
-        // Agregar datos de asientos seleccionados al formulario
-        selectedSeats.forEach(seat => {
-          $('<input>').attr({
-            type: 'hidden',
-            name: 'selected_seats',
-            value: seat
-          }).appendTo('#ticketForm');
-        });
-      });
-      
-      // Inicializar valores
-      updateTotalPrice();
-      updateButtons();
-    });
+    let totalSeats = {{ total_seats|default:0 }};
+    let occupiedSeats = {{ occupied_seats|default:"[]"|safe }};
   </script>
 {% endblock %}

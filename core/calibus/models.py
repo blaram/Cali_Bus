@@ -5,7 +5,13 @@ from datetime import datetime
 from django.forms import model_to_dict
 
 from config.settings import MEDIA_URL, STATIC_URL
-from core.calibus.choices import gender_choices, parcel_choices, remittance_choices
+from core.calibus.choices import (
+    gender_choices,
+    parcel_choices,
+    remittance_choices,
+    travel_status_choices,
+    ticket_type_choices,
+)
 from core.models import BaseModel
 
 # Define una función para obtener la hora actual
@@ -115,7 +121,12 @@ class Travel(models.Model):
         default=current_time, verbose_name="Hora de salida"
     )
     arrival = models.DateField(default=datetime.now, verbose_name="Fecha de llegada")
-    status = models.BooleanField(default=True, verbose_name="Estado")
+    status = models.CharField(
+        max_length=10,
+        choices=travel_status_choices,
+        default="active",
+        verbose_name="Estado",
+    )
 
     def __str__(self):
         return f"({self.departure} - {self.departure_time}) {self.busID.license_plate} -> {self.routeID.destination}"
@@ -282,7 +293,12 @@ class Ticket(models.Model):
     purchase_time = models.TimeField(
         default=current_time, verbose_name="Hora de compra"
     )
-    ticket_type = models.CharField()
+    ticket_type = models.CharField(
+        max_length=20,
+        choices=ticket_type_choices,
+        default="libre",
+        verbose_name="Tipo de pasaje",
+    )
     total_price = models.DecimalField(
         default=0.00, max_digits=9, decimal_places=2, verbose_name="Precio total"
     )

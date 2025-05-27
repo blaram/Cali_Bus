@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views import View
 
 from core.calibus.forms import ClientForm
 from core.calibus.mixins import ValidatePermissionRequiredMixin
@@ -135,3 +136,17 @@ class ClientDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Dele
         context['entity'] = 'Clientes'
         context['list_url'] = self.success_url
         return context
+
+
+class ClientAutocompleteView(View):
+    def get(self, request, *args, **kwargs):
+        term = request.GET.get('term', '')
+        results = []
+        if term:
+            clients = Client.objects.filter(names__icontains=term)[:20]
+            for client in clients:
+                results.append({
+                    'id': client.id,
+                    'text': f"{client.names} {client.surnames}".strip()
+                })
+        return JsonResponse({'results': results})

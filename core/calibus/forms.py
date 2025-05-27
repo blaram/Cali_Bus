@@ -13,6 +13,8 @@ from core.calibus.models import (
     Ticket,
 )
 
+from core.calibus.choices import ticket_type_choices
+
 
 class RouteForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -410,6 +412,7 @@ class RemittanceForm(ModelForm):
 
 
 class TicketForm(ModelForm):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for form in self.visible_fields():
@@ -432,8 +435,15 @@ class TicketForm(ModelForm):
                 attrs={
                     "class": "form-control select2",
                     "style": "width: 100%",
-                    "placeholder": "Ingrese su viaje",
+                    "readonly": True,
                 }
+            ),
+            "ticket_type": Select(
+                choices=ticket_type_choices,
+                attrs={
+                    "class": "form-control select2",
+                    "style": "width: 100%",
+                },
             ),
             "purchase_date": DateInput(
                 format="%Y-%m-%d",
