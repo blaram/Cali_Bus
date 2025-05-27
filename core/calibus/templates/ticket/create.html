@@ -173,47 +173,9 @@
         </h3>
       </div>
       <div class="card-body">
-        <!-- Primera fila: Información del viaje -->
-        <div class="card card-default">
-          <div class="card-header">
-            <h3 class="card-title">
-              <i class="fas fa-route"></i> Información del Viaje
-            </h3>
-          </div>
-          <div class="card-body">
-            <input type="hidden" name="action" value="{{ action }}">
-            <div class="row">
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Fecha de compra:</label>
-                  {{ form.purchase_date }}
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Viaje:</label>
-                  <div class="input-group">{{ form.travelID }}</div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Cliente:</label>
-                  <div class="input-group">{{ form.clientID }}</div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Tipo de ticket:</label>
-                  <div class="input-group">{{ form.ticket_type }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Segunda fila: Layout principal con asientos y detalles -->
         <div class="row">
-          <!-- Columna izquierda: Asientos del bus -->
+          <!-- Lado izquierdo: Mapa del bus -->
           <div class="col-md-6">
             <div class="card card-default">
               <div class="card-header">
@@ -231,21 +193,21 @@
                     <div id="seatMap">
                       <!-- Los asientos se generarán con JavaScript -->
                     </div>
-                    <div class="legend">
-                      <div class="legend-item">
-                        <div class="legend-seat available"></div>
+                    <div class="legend" style="display: flex; justify-content: space-around; margin-top: 15px; flex-wrap: wrap;">
+                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                        <div class="legend-seat available" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#28a745; border:2px solid #28a745;"></div>
                         <small>Disponible</small>
                       </div>
-                      <div class="legend-item">
-                        <div class="legend-seat occupied"></div>
+                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                        <div class="legend-seat occupied" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#dc3545; border:2px solid #dc3545;"></div>
                         <small>Ocupado</small>
                       </div>
-                      <div class="legend-item">
-                        <div class="legend-seat selected"></div>
+                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                        <div class="legend-seat selected" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#ffc107; border:2px solid #ffc107;"></div>
                         <small>Seleccionado</small>
                       </div>
-                      <div class="legend-item">
-                        <div class="legend-seat reserved"></div>
+                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                        <div class="legend-seat reserved" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#6f42c1; border:2px solid #6f42c1;"></div>
                         <small>Reservado</small>
                       </div>
                     </div>
@@ -255,8 +217,50 @@
             </div>
           </div>
 
-          <!-- Columna derecha: Detalles del ticket -->
+          <!-- Lado derecho: Información del viaje y detalles del pasaje -->
           <div class="col-md-6">
+            <!-- Información del viaje -->
+            <div class="card card-default mb-3">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-route"></i> Información del Viaje
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Fecha de compra:</label>
+                      {{ form.purchase_date }}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Viaje:</label>
+                      {% if travel %}
+                        <input type="text" class="form-control" value="{{ travel.routeID.origin }} → {{ travel.routeID.destination }} | Bus: {{ travel.busID.license_plate }} | Fecha salida: {{ travel.departure }} | Hora salida: {{ travel.departure_time }}" readonly>
+                        <input type="hidden" name="travelID" value="{{ travel.id }}">
+                      {% else %}
+                        <div class="input-group">{{ form.travelID }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Cliente:</label>
+                      <div class="input-group">{{ form.clientID }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Tipo de ticket:</label>
+                      <div class="input-group">{{ form.ticket_type }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Detalles del pasaje -->
             <div class="card card-default">
               <div class="card-header">
                 <h3 class="card-title">
@@ -348,5 +352,10 @@
   <script>
     let totalSeats = {{ total_seats|default:0 }};
     let occupiedSeats = {{ occupied_seats|default:"[]"|safe }};
+
+    // Hacer el campo de fecha readonly
+    $(document).ready(function() {
+      $("#id_purchase_date").attr("readonly", true);
+    });
   </script>
 {% endblock %}
