@@ -367,7 +367,8 @@
   </form>
   <script>
     let totalSeats = {{ total_seats|default:0 }};
-    let occupiedSeats = {{ occupied_seats|default:"[]"|safe }};
+    let soldSeats = {{ sold_seats|default:"[]"|safe }};
+    let reservedSeats = {{ reserved_seats|default:"[]"|safe }};
 
     // Hacer el campo de fecha readonly
     $(document).ready(function() {

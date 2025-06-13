@@ -106,7 +106,15 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                 context["travel"] = travel
                 context["bus"] = bus
                 context["total_seats"] = bus.capacity
-                print("DEBUG bus.capacity:", bus.capacity)  # <-- Agrega esto
+
+                sold_seats = TicketDetail.objects.filter(
+                    ticketID__travelID=travel, ticketID__ticket_type="vendido"
+                ).values_list("seat_number", flat=True)
+                reserved_seats = TicketDetail.objects.filter(
+                    ticketID__travelID=travel, ticketID__ticket_type="reservado"
+                ).values_list("seat_number", flat=True)
+                context["sold_seats"] = list(sold_seats)
+                context["reserved_seats"] = list(reserved_seats)
 
             except Travel.DoesNotExist:
                 context["travel"] = None

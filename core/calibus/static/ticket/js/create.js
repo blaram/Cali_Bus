@@ -10,8 +10,17 @@ $(function () {
     if (typeof occupiedSeats === 'string') {
         try { occupiedSeats = JSON.parse(occupiedSeats); } catch (e) { occupiedSeats = []; }
     }
+
+    if (typeof soldSeats === 'undefined') soldSeats = [];
+    if (typeof reservedSeats === 'undefined') reservedSeats = [];
+    if (typeof soldSeats === 'string') {
+        try { soldSeats = JSON.parse(soldSeats); } catch (e) { soldSeats = []; }
+    }
+    if (typeof reservedSeats === 'string') {
+        try { reservedSeats = JSON.parse(reservedSeats); } catch (e) { reservedSeats = []; }
+    }
     // Generar el layout de asientos
-    function generateSeatMap(totalSeats, occupiedSeats) {
+    function generateSeatMap(totalSeats, soldSeats, reservedSeats) {
         let html = '<div class="bus-container">';
         html += '<div class="row mb-2">';
         html += '<div class="col-6 d-flex align-items-center justify-content-start"><button type="button" class="btn btn-primary btn-block" disabled><i class="fas fa-user-tie"></i> Conductor</button></div>';
@@ -26,8 +35,15 @@ $(function () {
             for (let c = 0; c < 2; c++) {
                 let seatNum = r * seatsPerRow + c + 1;
                 if (seatNum > totalSeats) break;
-                let seatClass = occupiedSeats.includes(seatNum) ? 'seat occupied' : 'seat available';
-                html += `<div class="flex-fill mb-2 d-flex justify-content-start"><button type="button" class="${seatClass}" data-seat="${seatNum}" ${occupiedSeats.includes(seatNum) ? 'disabled' : ''}>${seatNum}</button></div>`;
+                let seatClass = '';
+                if (soldSeats.includes(seatNum)) {
+                    seatClass = 'seat occupied';
+                } else if (reservedSeats.includes(seatNum)) {
+                    seatClass = 'seat reserved';
+                } else {
+                    seatClass = 'seat available';
+                }
+                html += `<div class="flex-fill mb-2 d-flex justify-content-start"><button type="button" class="${seatClass}" data-seat="${seatNum}" ${(soldSeats.includes(seatNum) || reservedSeats.includes(seatNum)) ? 'disabled' : ''}>${seatNum}</button></div>`;
             }
             html += '</div>';
             // Lado derecho (2 asientos)
@@ -35,8 +51,15 @@ $(function () {
             for (let c = 0; c < 2; c++) {
                 let seatNum = r * seatsPerRow + 2 + c + 1;
                 if (seatNum > totalSeats) break;
-                let seatClass = occupiedSeats.includes(seatNum) ? 'seat occupied' : 'seat available';
-                html += `<div class="flex-fill mb-2 d-flex justify-content-end"><button type="button" class="${seatClass}" data-seat="${seatNum}" ${occupiedSeats.includes(seatNum) ? 'disabled' : ''}>${seatNum}</button></div>`;
+                let seatClass = '';
+                if (soldSeats.includes(seatNum)) {
+                    seatClass = 'seat occupied';
+                } else if (reservedSeats.includes(seatNum)) {
+                    seatClass = 'seat reserved';
+                } else {
+                    seatClass = 'seat available';
+                }
+                html += `<div class="flex-fill mb-2 d-flex justify-content-end"><button type="button" class="${seatClass}" data-seat="${seatNum}" ${(soldSeats.includes(seatNum) || reservedSeats.includes(seatNum)) ? 'disabled' : ''}>${seatNum}</button></div>`;
             }
             html += '</div>';
             html += '</div>';
@@ -45,7 +68,7 @@ $(function () {
         $('.seat-layout').html(html);
     }
 
-    generateSeatMap(totalSeats, occupiedSeats);
+    generateSeatMap(totalSeats, soldSeats, reservedSeats);
 
     // Manejar selección de asientos
     let selectedSeats = [];
