@@ -287,9 +287,6 @@ class Ticket(models.Model):
     purchase_date = models.DateField(
         default=datetime.now, verbose_name="Fecha de compra"
     )
-    purchase_time = models.TimeField(
-        default=current_time, verbose_name="Hora de compra"
-    )
     ticket_type = models.CharField(
         max_length=20,
         choices=ticket_type_choices,

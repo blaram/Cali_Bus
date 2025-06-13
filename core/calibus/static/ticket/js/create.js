@@ -59,6 +59,7 @@ $(function () {
             $(this).removeClass('selected');
         }
         updateSelectedSeats();
+        updateButtons();
     });
 
     function updateSelectedSeats() {
@@ -108,6 +109,7 @@ $(function () {
         selectedSeats = selectedSeats.filter(s => s !== seat);
         $(`.seat[data-seat='${seat}']`).removeClass('selected');
         updateSelectedSeats();
+        updateButtons();
     });
 
     function addPassengerForm(seatNumber) {
@@ -195,6 +197,65 @@ $(function () {
     // Cuando cambie el precio o la cantidad, recalcula el total
     $(document).on('input', '#seatPrice, #seatCount', function () {
         updateTotalPrice();
+    });
+
+    // Manejar el evento submit del formulario de ticket
+    $('form').on('submit', function (e) {
+        e.preventDefault(); // Evitar el envío tradicional del formulario
+
+        const details = [];
+        let total = 0;
+
+        // Iterar sobre los asientos seleccionados y armar los detalles
+        selectedSeats.forEach(function (seat) {
+            const price = parseFloat($('#seatPrice').val()) || 0; // Toma el precio general
+            total += price;
+            details.push({
+                seat_number: seat,
+                passengerID: $(`[name='passenger_${seat}']`).val(),
+                price: price
+            });
+        });
+
+        const ticketData = {
+            action: 'add',
+            ticket: {
+                clientID: $('#id_clientID').val(),
+                travelID: $('input[name="travelID"]').val(),
+                purchase_date: $('#id_purchase_date').val(),
+                ticket_type: $('#id_ticket_type').val(),
+                total_price: total.toFixed(2)
+            },
+            details: details
+        };
+
+        // Imprimir los datos en la consola para debug
+        console.log('Datos enviados:', ticketData);
+
+        // Usar submit_with_ajax para enviar los datos
+        submit_with_ajax(
+            window.location.pathname, // URL actual
+            'Notificación',
+            '¿Estás seguro de realizar esta acción?',
+            JSON.stringify(ticketData),
+            function () {
+                window.location.href = '/calibus/ticket/list/';
+            }
+        );
+    });
+
+    function updateButtons() {
+        const hasSelection = selectedSeats.length > 0;
+        $('#submitBtn, #reserveBtn').prop('disabled', !hasSelection);
+    }
+
+    // Llama a updateButtons() también al limpiar la selección
+    $('#clearSelection').click(function () {
+        selectedSeats = [];
+        $('.seat.selected').removeClass('selected');
+        $('#selectedSeatsList').html('<div class="text-muted text-center p-3"><i class="fas fa-hand-pointer fa-2x"></i><p class="mt-2">Selecciona asientos en el mapa del bus</p></div>');
+        $('#seatCount').val(0);
+        updateButtons();
     });
 
 });

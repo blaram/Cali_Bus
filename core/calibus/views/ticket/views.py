@@ -1,16 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, ListView
-from django.urls import reverse_lazy  # Add this import
-from django.http import JsonResponse  # Add this import
-from django.utils.decorators import method_decorator  # Add this import
-from django.views.decorators.csrf import csrf_exempt  # Add this import
+from django.urls import reverse_lazy
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+import json
 
 from core.calibus.mixins import ValidatePermissionRequiredMixin
-from core.calibus.forms import TicketForm  # Add this import, adjust the path if needed
-from core.calibus.models import (
-    Ticket,
-    Travel,
-)  # Add this import, adjust the path if needed
+from core.calibus.forms import TicketForm
+from core.calibus.models import Ticket, Travel, TicketDetail
 
 
 class TravelSaleListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
@@ -51,29 +50,44 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
     model = Ticket
     form_class = TicketForm
     template_name = "ticket/create.html"
-    success_url = reverse_lazy("index")
+    success_url = reverse_lazy("calibus:travel_sale_list")
     permission_required = "calibus.add_ticket"
     url_redirect = success_url
 
-    def get_initial(self):
-        initial = super().get_initial()
-        travel_id = self.request.GET.get("travel")
-        if travel_id:
-            initial["travelID"] = travel_id
-        return initial
-
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            action = request.POST["action"]
+            body = json.loads(request.body)
+            action = body.get("action", None)
             if action == "add":
-                form = self.get_form()
-                data = form.save()
+                with transaction.atomic():
+                    ticket_data = body.get("ticket", {})
+                    details = body.get("details", [])
+                    ticket_data["total_price"] = sum(
+                        float(detail["price"]) for detail in details
+                    )
+                    print("DEBUG ticket_data:", ticket_data)
+                    print("DEBUG detalles:", details)
+                    print("DEBUG total calculado:", ticket_data["total_price"])
+                    form = TicketForm(ticket_data)
+                    if form.is_valid():
+                        ticket = form.save()
+                        for detail in details:
+                            TicketDetail.objects.create(
+                                ticketID=ticket,
+                                seat_number=detail["seat_number"],
+                                passengerID_id=detail["passengerID"],
+                                price=detail["price"],
+                            )
+                        data["message"] = "Ticket y detalles guardados correctamente."
+                    else:
+                        data["error"] = form.errors
             else:
-                data["error"] = "No ha ingresado a ninguna opción"
+                data["error"] = "No ha ingresado a ninguna opción válida."
         except Exception as e:
             data["error"] = str(e)
         return JsonResponse(data)
