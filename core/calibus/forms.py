@@ -412,13 +412,13 @@ class RemittanceForm(ModelForm):
 
 
 class TicketForm(ModelForm):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for form in self.visible_fields():
             form.field.widget.attrs["class"] = "form-control"
             form.field.widget.attrs["autocomplete"] = "off"
         self.fields["clientID"].widget.attrs["autofocus"] = True
+        # Cambia el widget de clientID a TextInput para permitir autocompletado JS
 
     class Meta:
         model = Ticket
@@ -428,7 +428,7 @@ class TicketForm(ModelForm):
                 attrs={
                     "class": "form-control select2",
                     "style": "width: 100%",
-                    "placeholder": "Ingrese sus nombres",
+                    "placeholder": "Buscar cliente...",
                 }
             ),
             "travelID": Select(

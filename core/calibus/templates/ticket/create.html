@@ -238,7 +238,12 @@
                     <div class="form-group">
                       <label>Viaje:</label>
                       {% if travel %}
-                        <input type="text" class="form-control" value="{{ travel.routeID.origin }} → {{ travel.routeID.destination }} | Bus: {{ travel.busID.license_plate }} | Fecha salida: {{ travel.departure }} | Hora salida: {{ travel.departure_time }}" readonly>
+                        <div class="p-2 bg-light border rounded">
+                          <div><b>Ruta:</b> {{ travel.routeID.origin }} → {{ travel.routeID.destination }}</div>
+                          <div><b>Bus:</b> {{ travel.busID.license_plate }}</div>
+                          <div><b>Fecha de salida:</b> {{ travel.departure }}</div>
+                          <div><b>Hora de salida:</b> {{ travel.departure_time }}</div>
+                        </div>
                         <input type="hidden" name="travelID" value="{{ travel.id }}">
                       {% else %}
                         <div class="input-group">{{ form.travelID }}</div>
@@ -253,7 +258,7 @@
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label>Tipo de ticket:</label>
+                      <label>Tipo de Pasaje:</label>
                       <div class="input-group">{{ form.ticket_type }}</div>
                     </div>
                   </div>

@@ -109,4 +109,78 @@ $(function () {
         $(`.seat[data-seat='${seat}']`).removeClass('selected');
         updateSelectedSeats();
     });
+
+    function addPassengerForm(seatNumber) {
+        const formHtml = `
+          <div class="passenger-form" id="passengerForm${seatNumber}">
+            <h6><i class="fas fa-user"></i> Pasajero para asiento ${seatNumber}</h6>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Pasajero:</label>
+                  <input type="text" name="passenger_${seatNumber}" class="form-control occupant-autocomplete" placeholder="Buscar cliente..." required autocomplete="off">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Precio:</label>
+                  <div class="input-group">
+                    <input type="number" name="price_${seatNumber}" class="form-control" value="${seatPrice}" step="0.01" min="0">
+                    <div class="input-group-append">
+                      <span class="input-group-text">Bs</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        $('#passengerForms').append(formHtml);
+        $(`#passengerForm${seatNumber}`).slideDown();
+        $(`input[name='passenger_${seatNumber}']`).autocomplete({
+            minLength: 1,
+            source: function (request, response) {
+                $.ajax({
+                    url: '/client/autocomplete/',
+                    dataType: 'json',
+                    data: { term: request.term },
+                    success: function (data) {
+                        response($.map(data.results, function (item) {
+                            return {
+                                label: item.text,
+                                value: item.text,
+                                id: item.id
+                            };
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                // Puedes guardar el id del cliente seleccionado en un input hidden si lo necesitas
+                $(this).data('client-id', ui.item.id);
+            }
+        });
+    }
+
+    $('#id_clientID').select2({
+        theme: 'bootstrap4',
+        language: 'es',
+        placeholder: 'Buscar cliente...',
+        allowClear: true,
+        ajax: {
+            url: '/calibus/client/autocomplete/',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { term: params.term };
+            },
+            processResults: function (data) {
+                return data;
+            },
+            cache: true
+        },
+        minimumInputLength: 1
+    });
 });

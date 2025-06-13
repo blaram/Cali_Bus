@@ -171,9 +171,6 @@ class Parcel(models.Model):
     def __str__(self):
         return self.senderID.names
 
-    # def __str__(self):
-    #    return f"{self.senderID.names} -> {self.receiverID.names} ({self.description[:20]})"
-
     def toJSON(self):
         data = model_to_dict(self)
         data["senderID"] = (

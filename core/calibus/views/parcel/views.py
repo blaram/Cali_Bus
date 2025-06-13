@@ -14,11 +14,10 @@ from core.calibus.forms import ParcelForm
 from core.calibus.choices import parcel_choices
 
 
-
 class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
     model = Parcel
-    template_name = 'parcel/list.html'
-    permission_required = 'calibus.view_parcel'
+    template_name = "parcel/list.html"
+    permission_required = "calibus.view_parcel"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -27,35 +26,37 @@ class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListVi
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            action = request.POST['action']
-            if action == 'searchdata':
+            action = request.POST["action"]
+            if action == "searchdata":
                 data = []
                 for i in Parcel.objects.all():
-                    data.append(i.toJSON())  # Asegúrate de que el modelo Parcel tenga un método `toJSON`
+                    data.append(
+                        i.toJSON()
+                    )  # Asegúrate de que el modelo Parcel tenga un método `toJSON`
             else:
-                data['error'] = 'Ha ocurrido un error'
+                data["error"] = "Ha ocurrido un error"
         except Exception as e:
-            data['error'] = str(e)
+            data["error"] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Listado de Encomiendas'
-        context['create_url'] = reverse_lazy('calibus:parcel_create')
-        context['list_url'] = reverse_lazy('calibus:parcel_list')
-        context['entity'] = 'Encomiendas'
-        context['parent'] = 'envios'
-        context['segment'] = 'encomienda'
-        context['parcel_choices'] = json.dumps(dict(parcel_choices))
+        context["title"] = "Listado de Encomiendas"
+        context["create_url"] = reverse_lazy("calibus:parcel_create")
+        context["list_url"] = reverse_lazy("calibus:parcel_list")
+        context["entity"] = "Encomiendas"
+        context["parent"] = "envios"
+        context["segment"] = "encomienda"
+        context["parcel_choices"] = json.dumps(dict(parcel_choices))
         return context
 
 
 class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, CreateView):
     model = Parcel
     form_class = ParcelForm
-    template_name = 'parcel/create.html'
-    success_url = reverse_lazy('index')
-    permission_required = 'calibus.add_parcel'
+    template_name = "parcel/create.html"
+    success_url = reverse_lazy("index")
+    permission_required = "calibus.add_parcel"
     url_redirect = success_url
 
     @method_decorator(csrf_exempt)
@@ -69,20 +70,22 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
             body = json.loads(request.body)
             print("Datos recibidos en JSON:", body)  # Depuración
 
-            action = body.get('action', None)
+            action = body.get("action", None)
             print("Acción recibida:", action)  # Depuración
-            if action == 'add':
+            if action == "add":
                 with transaction.atomic():
                     # Recalcular el total en el backend
-                    items = body.get('items', [])
+                    items = body.get("items", [])
                     total_calculated = sum(
-                        float(item['shipping_cost']) for item in items
+                        float(item["shipping_cost"]) for item in items
                     )
 
                     # Comparar con el total enviado desde el frontend
-                    total_sent =float(body.get('total', 0.00))
+                    total_sent = float(body.get("total", 0.00))
                     if total_calculated != total_sent:
-                        data['error'] = 'El total enviado no coincide con el total calculado.'
+                        data["error"] = (
+                            "El total enviado no coincide con el total calculado."
+                        )
                         return JsonResponse(data)
 
                     # Procesar el formulario de Parcel
@@ -96,27 +99,29 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                         for item_data in items:
                             ParcelItem.objects.create(
                                 parcelID=parcel,
-                                description=item_data['description'],
-                                quantity=item_data['quantity'],
-                                weight=item_data['weight'],
-                                declared_value=item_data['declared_value'],
-                                shipping_cost=item_data['shipping_cost'],
+                                description=item_data["description"],
+                                quantity=item_data["quantity"],
+                                weight=item_data["weight"],
+                                declared_value=item_data["declared_value"],
+                                shipping_cost=item_data["shipping_cost"],
                             )
-                        data['message'] = 'Encomienda y artículos guardados correctamente.'
+                        data["message"] = (
+                            "Encomienda y artículos guardados correctamente."
+                        )
                     else:
-                        data['error'] = parcel_form.errors
+                        data["error"] = parcel_form.errors
             else:
-                data['error'] = 'No ha ingresado a ninguna opción válida.'
+                data["error"] = "No ha ingresado a ninguna opción válida."
         except Exception as e:
-            data['error'] = str(e)
+            data["error"] = str(e)
         return JsonResponse(data)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Registrar Encomienda'
-        context['entity'] = 'Encomiendas'
-        context['list_url'] = self.success_url
-        context['action'] = 'add'
+        context["title"] = "Registrar Encomienda"
+        context["entity"] = "Encomiendas"
+        context["list_url"] = self.success_url
+        context["action"] = "add"
         return context
 
 
@@ -124,32 +129,31 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
 def change_status(request):
     data = {}
     try:
-        if request.method == 'POST' and request.POST.get('action') == 'change_status':
-            parcel_id = request.POST.get('id')
-            current_status = request.POST.get('status')
+        if request.method == "POST" and request.POST.get("action") == "change_status":
+            parcel_id = request.POST.get("id")
+            current_status = request.POST.get("status")
 
             # Get the package by id
             parcel = Parcel.objects.get(pk=parcel_id)
 
             # Change the state according to the current status
-            if current_status == 'pending':
-                parcel.status = 'in_transit'
-            elif current_status == 'in_transit':
-                parcel.status = 'ready_for_pickup'
-            elif current_status == 'ready_for_pickup':
-                parcel.status = 'delivered'
-            elif current_status == 'delivered':
-                parcel.status = 'cancelled'
-            elif current_status == 'cancelled':
-                parcel.status = 'pending'
-            
+            if current_status == "pending":
+                parcel.status = "in_transit"
+            elif current_status == "in_transit":
+                parcel.status = "ready_for_pickup"
+            elif current_status == "ready_for_pickup":
+                parcel.status = "delivered"
+            elif current_status == "delivered":
+                parcel.status = "cancelled"
+            elif current_status == "cancelled":
+                parcel.status = "pending"
+
             # Save the change to the database
             parcel.save()
 
-            data['message'] = 'Estado cambiado correctamente.'
+            data["message"] = "Estado cambiado correctamente."
         else:
-            data['error'] = 'Solicitud no válida.'
+            data["error"] = "Solicitud no válida."
     except Exception as e:
-        data['error'] = str(e)
+        data["error"] = str(e)
     return JsonResponse(data)
-
