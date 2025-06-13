@@ -26,6 +26,8 @@
       border-radius: 5px;
       padding: 20px;
       min-height: 600px;
+      position: relative;
+      z-index: 1;
     }
     
     .bus-container {
@@ -108,6 +110,13 @@
       justify-content: space-around;
       margin-top: 15px;
       flex-wrap: wrap;
+      /* Quitar fondo y borde extra */
+      background: none;
+      border: none;
+      border-radius: 0;
+      padding: 10px 0;
+      z-index: 10;
+      position: relative;
     }
     
     .legend-item {
@@ -192,27 +201,29 @@
                     <!-- Generar asientos dinámicamente -->
                     <div id="seatMap">
                       <!-- Los asientos se generarán con JavaScript -->
-                    </div>
-                    <div class="legend" style="display: flex; justify-content: space-around; margin-top: 15px; flex-wrap: wrap;">
-                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
-                        <div class="legend-seat available" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#28a745; border:2px solid #28a745;"></div>
-                        <small>Disponible</small>
-                      </div>
-                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
-                        <div class="legend-seat occupied" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#dc3545; border:2px solid #dc3545;"></div>
-                        <small>Ocupado</small>
-                      </div>
-                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
-                        <div class="legend-seat selected" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#ffc107; border:2px solid #ffc107;"></div>
-                        <small>Seleccionado</small>
-                      </div>
-                      <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
-                        <div class="legend-seat reserved" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#6f42c1; border:2px solid #6f42c1;"></div>
-                        <small>Reservado</small>
-                      </div>
-                    </div>
+                    </div>  
                   </div>
+                  <!-- Leyenda fuera de .bus-container -->
+                 
                 </div>
+                <div class="legend" style="display: flex; justify-content: space-around; margin-top: 15px; flex-wrap: wrap;">
+                  <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                    <div class="legend-seat available" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#28a745; border:2px solid #28a745;"></div>
+                    <small>Disponible</small>
+                  </div>
+                  <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                    <div class="legend-seat occupied" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#dc3545; border:2px solid #dc3545;"></div>
+                    <small>Ocupado</small>
+                  </div>
+                  <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                    <div class="legend-seat selected" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#ffc107; border:2px solid #ffc107;"></div>
+                    <small>Seleccionado</small>
+                  </div>
+                  <div class="legend-item" style="display: flex; align-items: center; margin: 5px;">
+                    <div class="legend-seat reserved" style="width: 20px; height: 20px; border-radius: 3px; margin-right: 5px; background:#6f42c1; border:2px solid #6f42c1;"></div>
+                    <small>Reservado</small>
+                  </div>
+                </div>  
               </div>
             </div>
           </div>
@@ -296,7 +307,7 @@
                     <div class="form-group">
                       <label>Precio por asiento:</label>
                       <div class="input-group">
-                        <input type="text" id="seatPrice" class="form-control" readonly value="0.00">
+                        <input type="text" id="seatPrice" class="form-control" value="0.00">
                         <div class="input-group-append">
                           <span class="input-group-text">Bs</span>
                         </div>

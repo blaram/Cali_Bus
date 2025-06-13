@@ -451,4 +451,11 @@ class TicketForm(ModelForm):
                     "value": datetime.now().strftime("%Y-%m-%d"),
                 },
             ),
+            "total_price": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "style": "width: 100%",
+                    "readonly": True,
+                }
+            ),
         }

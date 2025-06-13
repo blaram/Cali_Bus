@@ -127,7 +127,7 @@ $(function () {
                 <div class="form-group">
                   <label>Precio:</label>
                   <div class="input-group">
-                    <input type="number" name="price_${seatNumber}" class="form-control" value="${seatPrice}" step="0.01" min="0">
+                    <input type="number" name="price_${seatNumber}" class="form-control seat-price-input" value="${seatPrice}" step="0.01" min="0" required>
                     <div class="input-group-append">
                       <span class="input-group-text">Bs</span>
                     </div>
@@ -183,4 +183,18 @@ $(function () {
         },
         minimumInputLength: 1
     });
+
+    // Actualiza el precio total cuando cambian los precios de los asientos
+    function updateTotalPrice() {
+        let cantidad = parseInt($('#seatCount').val()) || 0;
+        let precio = parseFloat($('#seatPrice').val()) || 0;
+        let total = cantidad * precio;
+        $('#id_total_price').val(total.toFixed(2));
+    }
+
+    // Cuando cambie el precio o la cantidad, recalcula el total
+    $(document).on('input', '#seatPrice, #seatCount', function () {
+        updateTotalPrice();
+    });
+
 });
