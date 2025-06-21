@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 import json
+from collections import defaultdict
 
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from core.calibus.forms import TicketForm
@@ -70,22 +71,32 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                     ticket_data["total_price"] = sum(
                         float(detail["price"]) for detail in details
                     )
-                    print("DEBUG ticket_data:", ticket_data)
-                    print("DEBUG detalles:", details)
-                    print("DEBUG total calculado:", ticket_data["total_price"])
-                    form = TicketForm(ticket_data)
-                    if form.is_valid():
-                        ticket = form.save()
-                        for detail in details:
-                            TicketDetail.objects.create(
-                                ticketID=ticket,
-                                seat_number=detail["seat_number"],
-                                passengerID_id=detail["passengerID"],
-                                price=detail["price"],
-                            )
-                        data["message"] = "Ticket y detalles guardados correctamente."
+
+                    reservation_ticket_id = body.get("reservation_ticket_id")
+                    if reservation_ticket_id:
+                        # Actualiza el ticket y sus detalles a vendido
+                        ticket = Ticket.objects.get(id=reservation_ticket_id)
+                        ticket.ticket_type = "vendido"
+                        ticket.total_price = ticket_data["total_price"]
+                        ticket.save()
+                        # Si quieres, puedes actualizar los detalles aquí si es necesario
+                        data["message"] = "Reserva vendida correctamente."
                     else:
-                        data["error"] = form.errors
+                        form = TicketForm(ticket_data)
+                        if form.is_valid():
+                            ticket = form.save()
+                            for detail in details:
+                                TicketDetail.objects.create(
+                                    ticketID=ticket,
+                                    seat_number=detail["seat_number"],
+                                    passengerID_id=detail["passengerID"],
+                                    price=detail["price"],
+                                )
+                            data["message"] = (
+                                "Ticket y detalles guardados correctamente."
+                            )
+                        else:
+                            data["error"] = form.errors
             else:
                 data["error"] = "No ha ingresado a ninguna opción válida."
         except Exception as e:
@@ -116,12 +127,56 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                 context["sold_seats"] = list(sold_seats)
                 context["reserved_seats"] = list(reserved_seats)
 
+                # --- Agrupar reservas por cliente y ticket id ---
+                reserved_details = TicketDetail.objects.filter(
+                    ticketID__travelID=travel, ticketID__ticket_type="reservado"
+                ).select_related("passengerID", "ticketID")
+                reservations_by_client_ticket = defaultdict(list)
+                client_map = {}
+                ticket_map = {}
+                for detail in reserved_details:
+                    # Usa el cliente principal del ticket si no hay passengerID
+                    client_id = (
+                        detail.passengerID.id
+                        if detail.passengerID
+                        else detail.ticketID.clientID.id
+                    )
+                    client_obj = (
+                        detail.passengerID
+                        if detail.passengerID
+                        else detail.ticketID.clientID
+                    )
+                    key = (client_id, detail.ticketID.id)
+                    reservations_by_client_ticket[key].append(detail.seat_number)
+                    client_map[client_id] = client_obj
+                    ticket_map[detail.ticketID.id] = detail.ticketID
+                context_list = []
+                for (
+                    client_id,
+                    ticket_id,
+                ), seats in reservations_by_client_ticket.items():
+                    detail_obj = reserved_details.filter(ticketID_id=ticket_id).first()
+                    context_list.append(
+                        {
+                            "client": client_map[client_id],
+                            "seats": seats,
+                            "ticket_id": ticket_id,
+                            "seat_price": detail_obj.price if detail_obj else 0,
+                        }
+                    )
+                context["reservations_by_client"] = context_list
             except Travel.DoesNotExist:
                 context["travel"] = None
                 context["bus"] = None
                 context["total_seats"] = 0
+                context["sold_seats"] = []
+                context["reserved_seats"] = []
+                context["reservations_by_client"] = []
         else:
             context["travel"] = None
             context["bus"] = None
             context["total_seats"] = 0
+            context["sold_seats"] = []
+            context["reserved_seats"] = []
+            context["reservations_by_client"] = []
         return context

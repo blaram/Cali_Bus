@@ -170,6 +170,7 @@
 
 {% block content %}
   <form method="POST" id="ticketForm">
+    <input type="hidden" id="reservationTicketId" name="reservation_ticket_id" value="">
     <div class="card card-primary">
       <div class="card-header">
         <h3 class="card-title">
@@ -230,8 +231,46 @@
 
           <!-- Lado derecho: Información del viaje y detalles del pasaje -->
           <div class="col-md-6">
+            <button type="button" class="btn btn-warning btn-flat mb-2" id="showReservationsBtn">
+              <i class="fas fa-bookmark"></i> Ver reservas
+            </button>
+            <div id="reservationsTable" style="display:none;">
+              <div class="card mt-3">
+                <div class="card-header bg-warning">
+                  <b><i class="fas fa-bookmark"></i> Reservas de Clientes</b>
+                </div>
+                <div class="card-body p-2">
+                  <table class="table table-sm table-bordered mb-0">
+                    <thead>
+                      <tr>
+                        <th>Pagar</th>
+                        <th>Cliente</th>
+                        <th>Asiento(s)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in reservations_by_client %}
+                      <tr>
+                        <td>
+                          <button type="button" class="btn btn-success btn-sm load-reservation"
+                                  data-ticket="{{ item.ticket_id }}"
+                                  data-client="{{ item.client.id }}"
+                                  data-seats="{{ item.seats|join:',' }}"
+                                  data-seat-price="{{ item.seat_price }}">
+                            Vender
+                          </button>
+                        </td>
+                        <td>{{ item.client.names }} {{ item.client.surnames }}</td>
+                        <td>{{ item.seats|join:', ' }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
             <!-- Información del viaje -->
-            <div class="card card-default mb-3">
+            <div class="card card-default mb-3" id="infoTravel">
               <div class="card-header">
                 <h3 class="card-title">
                   <i class="fas fa-route"></i> Información del Viaje
@@ -353,9 +392,7 @@
         <button type="submit" class="btn btn-primary btn-flat" id="submitBtn" disabled>
           <i class="fas fa-ticket-alt"></i> Vender Pasajes
         </button>
-        <button type="button" class="btn btn-warning btn-flat" id="reserveBtn" disabled>
-          <i class="fas fa-bookmark"></i> Reservar Asientos
-        </button>
+        
         <a href="{{ list_url }}" class="btn btn-success btn-flat">
           <i class="fas fa-sync"></i> Actualizar
         </a>

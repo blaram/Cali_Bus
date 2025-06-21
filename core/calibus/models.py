@@ -322,7 +322,7 @@ class TicketDetail(models.Model):
     ticketID = models.ForeignKey(Ticket, on_delete=models.CASCADE)
     seat_number = models.IntegerField(default=0, verbose_name="Número de asiento")
     passengerID = models.ForeignKey(
-        Client, on_delete=models.CASCADE, verbose_name="Pasajero"
+        Client, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Pasajero"
     )
     price = models.DecimalField(
         default=0.00, max_digits=9, decimal_places=2, verbose_name="Precio"

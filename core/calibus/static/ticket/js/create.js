@@ -228,6 +228,7 @@ $(function () {
 
         const details = [];
         let total = 0;
+        const reservationTicketId = $('#reservationTicketId').val();
 
         // Iterar sobre los asientos seleccionados y armar los detalles
         selectedSeats.forEach(function (seat) {
@@ -252,8 +253,9 @@ $(function () {
             details: details
         };
 
-        // Imprimir los datos en la consola para debug
-        console.log('Datos enviados:', ticketData);
+        if (reservationTicketId) {
+            ticketData.reservation_ticket_id = reservationTicketId;
+        }
 
         // Usar submit_with_ajax para enviar los datos
         submit_with_ajax(
@@ -279,6 +281,41 @@ $(function () {
         $('#selectedSeatsList').html('<div class="text-muted text-center p-3"><i class="fas fa-hand-pointer fa-2x"></i><p class="mt-2">Selecciona asientos en el mapa del bus</p></div>');
         $('#seatCount').val(0);
         updateButtons();
+    });
+    // Mostrar/ocultar la tabla de reservas y la info de viaje
+    $('#showReservationsBtn').on('click', function () {
+        $('#reservationsTable').toggle();
+        $('#infoTravel').toggle();
+    });
+    // Cuando se hace click en "Vender" de la tabla, muestra la info de viaje y oculta la tabla
+    $(document).on('click', '.load-reservation', function () {
+        $('#reservationsTable').hide();
+        $('#infoTravel').show();
+
+        // Obtener datos de la reserva
+        const clientId = $(this).data('client');
+        const seats = $(this).data('seats').toString().split(',').map(Number);
+        const ticketId = $(this).data('ticket');
+        $('#reservationTicketId').val(ticketId); // Guarda el ticket_id de la reserva
+
+        // Selecciona el cliente en el formulario
+        $('#id_clientID').val(clientId).trigger('change');
+
+        // Limpia selección actual y selecciona los asientos reservados
+        selectedSeats = [];
+        $('.seat.selected').removeClass('selected');
+        seats.forEach(function (seat) {
+            selectedSeats.push(seat);
+            $(`.seat[data-seat='${seat}']`).addClass('selected');
+        });
+        updateSelectedSeats();
+        updateButtons();
+
+        // Rellenar el precio por asiento y el total automáticamente
+        const seatPrice = $(this).data('seat-price');
+        $('#seatPrice').val(seatPrice);
+        // Actualiza el total
+        updateTotalPrice();
     });
 
 });
