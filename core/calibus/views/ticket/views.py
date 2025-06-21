@@ -165,6 +165,45 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                         }
                     )
                 context["reservations_by_client"] = context_list
+                # Lista de pasajeros del bus (tickets vendidos para este viaje)
+                passenger_details = (
+                    TicketDetail.objects.filter(
+                        ticketID__travelID=travel, ticketID__ticket_type="vendido"
+                    )
+                    .select_related("passengerID", "ticketID")
+                    .order_by("seat_number")
+                )
+
+                context["bus_passenger_list"] = [
+                    {
+                        "seat": detail.seat_number,
+                        "passenger": (
+                            f"{detail.passengerID.names} {detail.passengerID.surnames}"
+                            if detail.passengerID
+                            else ""
+                        ),
+                        "nacionalidad": (
+                            detail.passengerID.nationality if detail.passengerID else ""
+                        ),
+                        "fecha_nacimiento": (
+                            detail.passengerID.date_of_birth
+                            if detail.passengerID
+                            else ""
+                        ),
+                        "documento": (
+                            detail.passengerID.ci if detail.passengerID else ""
+                        ),
+                        "destino": (
+                            detail.ticketID.travelID.routeID.destination
+                            if detail.ticketID
+                            and detail.ticketID.travelID
+                            and detail.ticketID.travelID.routeID
+                            else ""
+                        ),
+                        "ticket_id": detail.ticketID.id,
+                    }
+                    for detail in passenger_details
+                ]
             except Travel.DoesNotExist:
                 context["travel"] = None
                 context["bus"] = None

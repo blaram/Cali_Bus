@@ -287,6 +287,11 @@ $(function () {
         $('#reservationsTable').toggle();
         $('#infoTravel').toggle();
     });
+
+    // Mostrar/ocultar la lista de pasajeros
+    $('#showPassengerListBtn').on('click', function () {
+        $('#passengerListTable').toggle();
+    });
     // Cuando se hace click en "Vender" de la tabla, muestra la info de viaje y oculta la tabla
     $(document).on('click', '.load-reservation', function () {
         $('#reservationsTable').hide();

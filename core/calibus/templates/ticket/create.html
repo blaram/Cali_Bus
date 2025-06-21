@@ -234,6 +234,9 @@
             <button type="button" class="btn btn-warning btn-flat mb-2" id="showReservationsBtn">
               <i class="fas fa-bookmark"></i> Ver reservas
             </button>
+            <button type="button" class="btn btn-info btn-flat mb-2 ml-2" id="showPassengerListBtn">
+              <i class="fas fa-users"></i> Ver lista de pasajeros
+            </button>
             <div id="reservationsTable" style="display:none;">
               <div class="card mt-3">
                 <div class="card-header bg-warning">
@@ -262,6 +265,67 @@
                         </td>
                         <td>{{ item.client.names }} {{ item.client.surnames }}</td>
                         <td>{{ item.seats|join:', ' }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!-- Lista de pasajeros -->
+            <div id="passengerListTable" style="display:none;">
+              <div class="card mt-3">
+                <div class="card-header bg-info">
+                  <b><i class="fas fa-users"></i> Relación de Pasajeros del Bus</b>
+                </div>
+                <div class="card-body p-2">
+                  <div class="row mb-2">
+                    <div class="col-md-5"><b>Fecha de viaje:</b> {{ travel.departure }}</div>
+                    <div class="col-md-3"><b>Horario:</b> {{ travel.departure_time }}</div>
+                    <div class="col-md-4"><b>Patente:</b> {{ bus.license_plate }}</div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="col-md-5"><b>Nro de chasis:</b> {{ bus.chassis_number }}</div>
+                    <div class="col-md-3"><b>Modelo:</b> {{ bus.model }}</div>
+                    <div class="col-md-4"><b>Color:</b> {{ bus.color }}</div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="col-md-5"><b>Nro de motor:</b> {{ bus.engine_number }}</div>
+                    <div class="col-md-3"><b>Año:</b> {{ bus.year }}</div>
+                    <div class="col-md-4"><b>Marca:</b> {{ bus.brand }}</div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="col-md-6">
+                      <b>Conductor:</b> Juan Pérez &nbsp;&nbsp;
+                      <b>Licencia:</b> 123456 &nbsp;&nbsp;
+                      <b>Nacionalidad:</b> Boliviano
+                    </div>
+                    <div class="col-md-6">
+                      <b>Copiloto:</b> Carlos López &nbsp;&nbsp;
+                      <b>Licencia:</b> 654321 &nbsp;&nbsp;
+                      <b>Nacionalidad:</b> Boliviano
+                    </div>
+                  </div>
+                  <table class="table table-sm table-bordered mb-0">
+                    <thead>
+                      <tr>
+                        <th>Asiento</th>
+                        <th>Pasajero</th>
+                        <th>Nacionalidad</th>
+                        <th>Fecha Nacimiento</th>
+                        <th>Documento</th>
+                        <th>Destino</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in bus_passenger_list %}
+                      <tr>
+                        <td>{{ item.seat }}</td>
+                        <td>{{ item.passenger }}</td>
+                        <td>{{ item.nacionalidad }}</td>
+                        <td>{{ item.fecha_nacimiento }}</td>
+                        <td>{{ item.documento }}</td>
+                        <td>{{ item.destino }}</td>
                       </tr>
                       {% endfor %}
                     </tbody>
