@@ -331,6 +331,7 @@ $(function () {
         $('#passengerListModal').modal('show');
     });
 
+    // Botón para imprimir directamente
     $('#printModalPassengerList').on('click', function () {
         var printContents = document.getElementById('modalPassengerListContent').innerHTML;
         var win = window.open('', '_blank');
@@ -342,6 +343,23 @@ $(function () {
         win.document.write('</body></html>');
         win.document.close();
         win.focus();
+        win.print();
     });
 
+    // Botón para descargar como PDF usando print dialog (el usuario debe elegir "Guardar como PDF")
+    $('#downloadPdfPassengerList').on('click', function () {
+        var printContents = document.getElementById('modalPassengerListContent').innerHTML;
+        var win = window.open('', '_blank');
+        win.document.write('<html><head><title>Lista de Pasajeros</title>');
+        win.document.write('<link rel="stylesheet" href="/static/lib/bootstrap-4.6.2/css/bootstrap.min.css">');
+        win.document.write('<style>body{padding:30px;} .btn, .modal-header, .modal-footer{display:none !important;} @media print { body { background: #fff; } }</style>');
+        win.document.write('</head><body>');
+        win.document.write(printContents);
+        win.document.write('</body></html>');
+        win.document.close();
+        win.focus();
+        setTimeout(function () {
+            win.print();
+        }, 500); // Espera a que cargue el contenido antes de abrir el diálogo de impresión
+    });
 });
