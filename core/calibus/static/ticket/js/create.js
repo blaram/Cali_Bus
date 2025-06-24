@@ -323,4 +323,25 @@ $(function () {
         updateTotalPrice();
     });
 
+    // Modal de la lista de pasajeros
+    $('#openPassengerListModal').on('click', function () {
+        // Obtén el HTML del bloque de la lista de pasajeros
+        var content = $('#passengerListTable .card').html();
+        $('#modalPassengerListContent').html(content);
+        $('#passengerListModal').modal('show');
+    });
+
+    $('#printModalPassengerList').on('click', function () {
+        var printContents = document.getElementById('modalPassengerListContent').innerHTML;
+        var win = window.open('', '_blank');
+        win.document.write('<html><head><title>Lista de Pasajeros</title>');
+        win.document.write('<link rel="stylesheet" href="/static/lib/bootstrap-4.6.2/css/bootstrap.min.css">');
+        win.document.write('<style>body{padding:30px;} .btn, .modal-header, .modal-footer{display:none !important;} @media print { body { background: #fff; } }</style>');
+        win.document.write('</head><body>');
+        win.document.write(printContents);
+        win.document.write('</body></html>');
+        win.document.close();
+        win.focus();
+    });
+
 });
