@@ -12,10 +12,11 @@ from django.template.loader import get_template
 from django.conf import settings
 import os
 from xhtml2pdf import pisa
+from datetime import date
 
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from core.calibus.forms import TicketForm
-from core.calibus.models import Ticket, Travel, TicketDetail
+from core.calibus.models import Ticket, Travel, TicketDetail, DailyCashBox, CashMovement
 
 
 class TravelSaleListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
@@ -84,6 +85,36 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                         ticket.ticket_type = "vendido"
                         ticket.total_price = ticket_data["total_price"]
                         ticket.save()
+                        # Actualiza los detalles del ticket
+                        if ticket.ticket_type == "vendido":
+                            payment_method = body.get("payment_method")
+                            if not payment_method:
+                                data["error"] = (
+                                    "Debe seleccionar un método de pago para la venta."
+                                )
+                                raise Exception(data["error"])
+                            cashbox = DailyCashBox.objects.filter(
+                                date=date.today(), status="open"
+                            ).first()
+                            if not cashbox:
+                                data["error"] = (
+                                    "No existe una caja diaria abierta para hoy. No se puede registrar el movimiento de caja."
+                                )
+                                raise Exception(data["error"])
+                            description = f"Venta de pasaje a {ticket.travelID.routeID.destination} para {ticket.clientID.names} {ticket.clientID.surnames}"
+                            CashMovement.objects.create(
+                                cashboxID=cashbox,
+                                movement_type="income",
+                                amount=ticket.total_price,
+                                payment_method=payment_method,
+                                description=description,
+                                ticket_id=ticket.id,
+                            )
+                            cashbox.total_income += ticket.total_price
+                            cashbox.final_balance = (
+                                cashbox.total_income - cashbox.total_expenses
+                            )
+                            cashbox.save()
                         # Si quieres, puedes actualizar los detalles aquí si es necesario
                         data["message"] = "Reserva vendida correctamente."
                     else:
@@ -97,6 +128,38 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                                     passengerID_id=detail["passengerID"],
                                     price=detail["price"],
                                 )
+                            # Solo si el ticket es vendido
+                            if ticket.ticket_type == "vendido":
+                                payment_method = body.get("payment_method")
+                                if not payment_method:
+                                    data["error"] = (
+                                        "Debe seleccionar un método de pago para la venta."
+                                    )
+                                    raise Exception(data["error"])
+                                # Obtén la caja diaria activa (abierta) del día
+                                cashbox = DailyCashBox.objects.filter(
+                                    date=date.today(), status="open"
+                                ).first()
+                                if not cashbox:
+                                    data["error"] = (
+                                        "No existe una caja diaria abierta para hoy. No se puede registrar el movimiento de caja."
+                                    )
+                                    raise Exception(data["error"])
+                                description = f"Venta de pasaje a {ticket.travelID.routeID.destination} para {ticket.clientID.names} {ticket.clientID.surnames}"
+                                CashMovement.objects.create(
+                                    cashboxID=cashbox,
+                                    movement_type="income",
+                                    amount=ticket.total_price,
+                                    payment_method=payment_method,
+                                    description=description,
+                                    ticket_id=ticket.id,
+                                )
+                                cashbox.total_income += ticket.total_price
+                                cashbox.final_balance = (
+                                    cashbox.total_income - cashbox.total_expenses
+                                )
+                                cashbox.save()
+
                             data["message"] = (
                                 "Ticket y detalles guardados correctamente."
                             )

@@ -250,7 +250,8 @@ $(function () {
                 ticket_type: $('#id_ticket_type').val(),
                 total_price: total.toFixed(2)
             },
-            details: details
+            details: details,
+            payment_method: $('#id_payment_method').val()
         };
 
         if (reservationTicketId) {
@@ -361,5 +362,15 @@ $(function () {
         setTimeout(function () {
             win.print();
         }, 500); // Espera a que cargue el contenido antes de abrir el diálogo de impresión
+    });
+
+    // Función para mostrar/ocultar el método de pago
+    $('#id_ticket_type').on('change', function () {
+        if ($(this).val() === 'vendido') {
+            $('#paymentMethodRow').show();
+        } else {
+            $('#paymentMethodRow').hide();
+            $('#id_payment_method').val('');
+        }
     });
 });

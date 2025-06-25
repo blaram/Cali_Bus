@@ -14,6 +14,7 @@ from core.calibus.choices import (
     cashbox_type_choices,
     payment_method_choices,
     movement_type_choices,
+    cashbox_status_choices,
 )
 from core.models import BaseModel
 
@@ -363,6 +364,12 @@ class DailyCashBox(models.Model):
     cashbox_type = models.CharField(
         max_length=20, choices=cashbox_type_choices, verbose_name="Tipo de arqueo"
     )
+    status = models.CharField(
+        max_length=10,
+        choices=cashbox_status_choices,
+        default="open",
+        verbose_name="Estado",
+    )
 
     def __str__(self):
         return f"CashBox {self.cashbox_id} - {self.date}"
@@ -372,6 +379,10 @@ class DailyCashBox(models.Model):
         data["cashbox_type"] = {
             "id": self.cashbox_type,
             "name": self.get_cashbox_type_display(),
+        }
+        data["status"] = {
+            "id": self.status,
+            "name": self.get_status_display(),
         }
         return data
 

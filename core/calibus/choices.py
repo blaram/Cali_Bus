@@ -52,3 +52,8 @@ payment_method_choices = (
     ("qr", "Pago con QR"),
     ("cash", "Pago en efectivo"),
 )
+
+cashbox_status_choices = (
+    ("open", "Abierto"),
+    ("closed", "Cerrado"),
+)
