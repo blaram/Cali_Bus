@@ -11,6 +11,9 @@ from core.calibus.choices import (
     remittance_choices,
     travel_status_choices,
     ticket_type_choices,
+    cashbox_type_choices,
+    payment_method_choices,
+    movement_type_choices,
 )
 from core.models import BaseModel
 
@@ -346,17 +349,74 @@ class TicketDetail(models.Model):
         ordering = ["id"]
 
 
-class ReceiptDetail(models.Model):
-    parc = models.ForeignKey(Parcel, on_delete=models.CASCADE)
-    mount = models.DecimalField(
-        default=0.00, max_digits=9, decimal_places=2, verbose_name="Monto"
+class DailyCashBox(models.Model):
+    date = models.DateField(verbose_name="Fecha", auto_now_add=True)
+    total_income = models.DecimalField(
+        max_digits=12, decimal_places=2, verbose_name="Total Ingresos"
+    )
+    total_expenses = models.DecimalField(
+        max_digits=12, decimal_places=2, verbose_name="Total Egresos"
+    )
+    final_balance = models.DecimalField(
+        max_digits=12, decimal_places=2, verbose_name="Saldo Final"
+    )
+    cashbox_type = models.CharField(
+        max_length=20, choices=cashbox_type_choices, verbose_name="Tipo de arqueo"
     )
 
     def __str__(self):
-        return self.parc.description
+        return f"CashBox {self.cashbox_id} - {self.date}"
+
+    def toJSON(self):
+        data = model_to_dict(self)
+        data["cashbox_type"] = {
+            "id": self.cashbox_type,
+            "name": self.get_cashbox_type_display(),
+        }
+        return data
 
     class Meta:
-        db_table = "DetallesRecibos"
-        verbose_name = "Detalle de Recibo"
-        verbose_name_plural = "Detalles de Recibos"
+        db_table = "CajaDiaria"
+        verbose_name = "Caja Diaria"
+        verbose_name_plural = "Cajas Diarias"
+        ordering = ["id"]
+
+
+class CashMovement(models.Model):
+    cashboxID = models.ForeignKey(
+        DailyCashBox, on_delete=models.CASCADE, verbose_name="Caja Diaria"
+    )
+    movement_type = models.CharField(
+        max_length=10, choices=movement_type_choices, verbose_name="Tipo de movimiento"
+    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Monto")
+    payment_method = models.CharField(
+        max_length=10, choices=payment_method_choices, verbose_name="Método de pago"
+    )
+    description = models.TextField(verbose_name="Descripción", null=True, blank=True)
+    date = models.DateField(auto_now_add=True, verbose_name="Fecha")
+    time = models.TimeField(auto_now_add=True, verbose_name="Hora")
+    ticket_id = models.BigIntegerField(
+        null=True, blank=True, verbose_name="ID del Ticket"
+    )
+    parcel_id = models.BigIntegerField(
+        null=True, blank=True, verbose_name="ID de la Encomienda"
+    )
+
+    def __str__(self):
+        return f"Movement {self.movement_id} - CashBox {self.cashbox_id}"
+
+    def toJSON(self):
+        data = model_to_dict(self)
+        data["cashbox"] = self.cashbox_id
+        data["payment_method"] = {
+            "id": self.payment_method,
+            "name": self.get_payment_method_display(),
+        }
+        return data
+
+    class Meta:
+        db_table = "MovimientosCaja"
+        verbose_name = "Movimiento de Caja"
+        verbose_name_plural = "Movimientos de Caja"
         ordering = ["id"]

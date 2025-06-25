@@ -37,3 +37,18 @@ ticket_type_choices = (
     ("vendido", "Vendido"),
     ("libre", "Libre"),
 )
+
+cashbox_type_choices = (
+    ("shift_change", "Cambio de turno"),
+    ("cash_closing", "Cierre de caja"),
+)
+
+movement_type_choices = (
+    ("income", "Ingreso"),
+    ("expense", "Egreso"),
+)
+
+payment_method_choices = (
+    ("qr", "Pago con QR"),
+    ("cash", "Pago en efectivo"),
+)
