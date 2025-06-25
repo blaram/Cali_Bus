@@ -22,7 +22,11 @@ urlpatterns = [
     path("client/add/", ClientCreateView.as_view(), name="client_create"),
     path("client/update/<int:pk>/", ClientUpdateView.as_view(), name="client_update"),
     path("client/delete/<int:pk>/", ClientDeleteView.as_view(), name="client_delete"),
-    path("client/autocomplete/", ClientAutocompleteView.as_view(), name="client_autocomplete"),
+    path(
+        "client/autocomplete/",
+        ClientAutocompleteView.as_view(),
+        name="client_autocomplete",
+    ),
     # travel
     path("travel/list/", TravelListView.as_view(), name="travel_list"),
     path("travel/add/", TravelCreateView.as_view(), name="travel_create"),
@@ -47,4 +51,9 @@ urlpatterns = [
     # ticket
     path("ticket/list/", TravelSaleListView.as_view(), name="travel_sale_list"),
     path("ticket/add/", TicketCreateView.as_view(), name="ticket_create"),
+    path(
+        "passenger/list/pdf/<int:travel_id>/",
+        PassengerListPdfView.as_view(),
+        name="passenger_list_pdf",
+    ),
 ]

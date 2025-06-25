@@ -1,12 +1,17 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, ListView
+from django.views import View
 from django.urls import reverse_lazy
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 import json
 from collections import defaultdict
+from django.template.loader import get_template
+from django.conf import settings
+import os
+from xhtml2pdf import pisa
 
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from core.calibus.forms import TicketForm
@@ -219,3 +224,77 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
             context["reserved_seats"] = []
             context["reservations_by_client"] = []
         return context
+
+
+class PassengerListPdfView(View):
+    def link_callback(self, uri, rel):
+        sUrl = settings.STATIC_URL
+        sRoot = settings.STATICFILES_DIRS[0]
+        mUrl = settings.MEDIA_URL
+        mRoot = settings.MEDIA_ROOT
+
+        if uri.startswith(mUrl):
+            path = os.path.join(mRoot, uri.replace(mUrl, ""))
+        elif uri.startswith(sUrl):
+            path = os.path.join(sRoot, uri.replace(sUrl, ""))
+        else:
+            return uri
+
+        if not os.path.isfile(path):
+            raise Exception("El recurso %s no existe" % path)
+        return path
+
+    def get(self, request, *args, **kwargs):
+        try:
+            # travel_id = kwargs.get("travel_id")
+            travel = Travel.objects.get(pk=self.kwargs["travel_id"])
+            bus = travel.busID
+            passenger_details = (
+                TicketDetail.objects.filter(
+                    ticketID__travelID=travel, ticketID__ticket_type="vendido"
+                )
+                .select_related("passengerID", "ticketID")
+                .order_by("seat_number")
+            )
+            context = {
+                "travel": travel,
+                "bus": bus,
+                "logo": "{}{}".format(settings.STATIC_URL, "img/logo_calibus.png"),
+                "bus_passenger_list": [
+                    {
+                        "seat": detail.seat_number,
+                        "passenger": (
+                            f"{detail.passengerID.names} {detail.passengerID.surnames}"
+                            if detail.passengerID
+                            else ""
+                        ),
+                        "nacionalidad": (
+                            detail.passengerID.nationality if detail.passengerID else ""
+                        ),
+                        "fecha_nacimiento": (
+                            detail.passengerID.date_of_birth
+                            if detail.passengerID
+                            else ""
+                        ),
+                        "documento": (
+                            detail.passengerID.ci if detail.passengerID else ""
+                        ),
+                        "destino": (
+                            detail.ticketID.travelID.routeID.destination
+                            if detail.ticketID
+                            and detail.ticketID.travelID
+                            and detail.ticketID.travelID.routeID
+                            else ""
+                        ),
+                    }
+                    for detail in passenger_details
+                ],
+            }
+            template = get_template("ticket/passenger_list_pdf.html")
+            html = template.render(context)
+            response = HttpResponse(content_type="application/pdf")
+            response["Content-Disposition"] = 'inline; filename="lista_pasajeros.pdf"'
+            pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
+            return response
+        except Exception as e:
+            return HttpResponse("Ocurrió un error al generar el PDF: %s" % str(e))

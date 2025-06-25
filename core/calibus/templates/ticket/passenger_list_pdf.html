@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page {
+      size: letter;
+      margin: 1cm;
+    }
+    body { font-family: Arial, sans-serif; font-size: 12px; }
+    .header-table { width: 100%; }
+    .header-table td { vertical-align: middle; }
+    .title { font-size: 20px; font-weight: bold; text-align: right; }
+    .info-table { width: 100%; margin-bottom: 8px; }
+    .info-table td { padding: 2px 8px; }
+    .row-label { font-weight: bold; }
+    table.data {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table.data th, table.data td {
+      border: none;
+      padding: 4px;
+      text-align: left;
+    }
+    table.data th {
+      background: #eee;
+    }
+  </style>
+</head>
+<body>
+  <table class="header-table">
+    <tr>
+      <td style="width: 180px; text-align:left;">
+        <img src="{{ logo }}" style="height:60px; width:auto; max-width:180px;">
+      </td>
+      <td class="title" style="text-align:right;">
+        Relación de Pasajeros del Bus
+      </td>
+    </tr>
+  </table>
+
+  <table class="info-table" style="font-size:11px;">
+    <tr>
+      <td class="row-label">Fecha:</td>
+      <td>{{ travel.departure|date:"d-m-Y" }}</td>
+      <td class="row-label">Hora:</td>
+      <td>{{ travel.departure_time }}</td>
+      <td class="row-label">Patente:</td>
+      <td>{{ bus.license_plate }}</td>
+    </tr>
+    <tr>
+      <td class="row-label">Chasis:</td>
+      <td style="max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ bus.chassis_number }}</td>
+      <td class="row-label">Modelo:</td>
+      <td>{{ bus.model }}</td>
+      <td class="row-label">Color:</td>
+      <td>{{ bus.color }}</td>
+    </tr>
+    <tr>
+      <td class="row-label">Motor:</td>
+      <td style="max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ bus.engine_number }}</td>
+      <td class="row-label">Año:</td>
+      <td>{{ bus.year }}</td>
+      <td class="row-label">Marca:</td>
+      <td>{{ bus.brand }}</td>
+    </tr>
+    <tr>
+      <td class="row-label">Conductor:</td>
+      <td colspan="5">Juan Pérez / Lic: 123456 / Boliviano</td>
+    </tr>
+    <tr>
+      <td class="row-label">Copiloto:</td>
+      <td colspan="5">Carlos López / Lic: 654321 / Boliviano</td>
+    </tr>
+  </table>
+
+  <table class="data">
+    <thead>
+      <tr style="border-top:2px solid #333; border-bottom:2px solid #333;">
+        <th>Asiento</th>
+        <th>Pasajero</th>
+        <th>Nacionalidad</th>
+        <th>Fecha Nacimiento</th>
+        <th>Documento</th>
+        <th>Destino</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in bus_passenger_list %}
+      <tr{% if forloop.last %} style="border-bottom:2px solid #333;"{% endif %}>
+        <td>{{ item.seat }}</td>
+        <td>{{ item.passenger }}</td>
+        <td>{{ item.nacionalidad }}</td>
+        <td>
+          {% if item.fecha_nacimiento %}
+            {{ item.fecha_nacimiento|date:"d-m-Y" }}
+          {% endif %}
+        </td>
+        <td>{{ item.documento }}</td>
+        <td>{{ item.destino }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
