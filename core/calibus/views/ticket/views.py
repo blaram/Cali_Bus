@@ -289,6 +289,51 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
         return context
 
 
+class TicketListPdfView(View):
+    def link_callback(self, uri, rel):
+        sUrl = settings.STATIC_URL
+        sRoot = settings.STATICFILES_DIRS[0]
+        mUrl = settings.MEDIA_URL
+        mRoot = settings.MEDIA_ROOT
+
+        if uri.startswith(mUrl):
+            path = os.path.join(mRoot, uri.replace(mUrl, ""))
+        elif uri.startswith(sUrl):
+            path = os.path.join(sRoot, uri.replace(sUrl, ""))
+        else:
+            return uri
+
+        if not os.path.isfile(path):
+            raise Exception("El recurso %s no existe" % path)
+        return path
+
+    def get(self, request, ticket_id, *args, **kwargs):
+        try:
+            ticket = Ticket.objects.get(pk=ticket_id)
+            details = TicketDetail.objects.filter(ticketID=ticket).select_related(
+                "passengerID"
+            )
+            context = {
+                "ticket": ticket,
+                "client": ticket.clientID,
+                "travel": ticket.travelID,
+                "details": details,
+                "logo": "{}{}".format(settings.STATIC_URL, "img/logo_calibus.png"),
+            }
+            template = get_template(
+                "ticket/ticket_list_pdf.html"
+            )  # Debes crear este template
+            html = template.render(context)
+            response = HttpResponse(content_type="application/pdf")
+            response["Content-Disposition"] = (
+                f'inline; filename="ticket_{ticket_id}.pdf"'
+            )
+            pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
+            return response
+        except Exception as e:
+            return HttpResponse("Ocurrió un error al generar el PDF: %s" % str(e))
+
+
 class PassengerListPdfView(View):
     def link_callback(self, uri, rel):
         sUrl = settings.STATIC_URL
