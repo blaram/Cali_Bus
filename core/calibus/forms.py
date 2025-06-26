@@ -426,7 +426,7 @@ class TicketForm(ModelForm):
         widgets = {
             "clientID": Select(
                 attrs={
-                    "class": "form-control select2",
+                    "class": "form-control",
                     "style": "width: 100%",
                     "placeholder": "Buscar cliente...",
                 }

@@ -78,7 +78,7 @@ class Client(models.Model):
     )
 
     def __str__(self):
-        return self.names
+        return f"{self.names} {self.surnames}"
 
     def toJSON(self):
         item = model_to_dict(self)
