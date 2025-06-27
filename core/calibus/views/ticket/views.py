@@ -49,7 +49,7 @@ class TravelSaleListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Li
         context["title"] = "Venta de Pasajes - Viajes Disponibles"
         context["list_url"] = reverse_lazy("calibus:travel_sale_list")
         context["entity"] = "Venta de Pasajes"
-        context["parent"] = "empresa"
+        context["parent"] = "pasajes"
         context["segment"] = "venta_pasajes"
         return context
 
@@ -192,6 +192,8 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
         context["entity"] = "Pasajes"
         context["list_url"] = self.success_url
         context["action"] = "add"
+        context["segment"] = "venta_pasajes"
+        context["parent"] = "pasajes"
         travel_id = self.request.GET.get("travel")
         if travel_id:
             try:
