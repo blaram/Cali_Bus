@@ -52,6 +52,11 @@ urlpatterns = [
     path("ticket/list/", TravelSaleListView.as_view(), name="travel_sale_list"),
     path("ticket/add/", TicketCreateView.as_view(), name="ticket_create"),
     path(
+        "ticket/passenger/pdf/<int:detail_id>/",
+        TicketPassengerPdfView.as_view(),
+        name="ticket_passenger_pdf",
+    ),
+    path(
         "ticket/list/pdf/<int:ticket_id>/",
         TicketListPdfView.as_view(),
         name="ticket_list_pdf",
