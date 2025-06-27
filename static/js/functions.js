@@ -42,7 +42,7 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                     }).done(function (data) {
                         console.log(data);
                         if (!data.hasOwnProperty('error')) {
-                            callback();
+                            callback(data);
                             return false;
                         }
                         message_error(data.error);
@@ -58,6 +58,36 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                 btnClass: 'btn-red',
                 action: function () {
 
+                }
+            },
+        }
+    })
+}
+
+function alert_action(title, content, callback, cancel) {
+    $.confirm({
+        theme: 'material',
+        title: title,
+        icon: 'fa fa-info',
+        content: content,
+        columnClass: 'small',
+        typeAnimated: true,
+        cancelButtonClass: 'btn-primary',
+        draggable: true,
+        dragWindowBorder: false,
+        buttons: {
+            info: {
+                text: "Si",
+                btnClass: 'btn-primary',
+                action: function () {
+                    callback();
+                }
+            },
+            danger: {
+                text: "No",
+                btnClass: 'btn-red',
+                action: function () {
+                    cancel();
                 }
             },
         }

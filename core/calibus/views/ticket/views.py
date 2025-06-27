@@ -13,6 +13,7 @@ from django.conf import settings
 import os
 from xhtml2pdf import pisa
 from datetime import date
+from decimal import Decimal
 
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from core.calibus.forms import TicketForm
@@ -57,7 +58,7 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
     model = Ticket
     form_class = TicketForm
     template_name = "ticket/create.html"
-    success_url = reverse_lazy("calibus:travel_sale_list")
+    success_url = reverse_lazy("calibus:ticket_create")
     permission_required = "calibus.add_ticket"
     url_redirect = success_url
 
@@ -85,6 +86,18 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                         ticket.ticket_type = "vendido"
                         ticket.total_price = ticket_data["total_price"]
                         ticket.save()
+                        data["ticket_id"] = ticket.id
+                        # Actualiza los datos de los ocupantes (TicketDetail) al vender una reserva
+                        for detail in details:
+                            seat_number = detail["seat_number"]
+                            passenger_id = detail["passengerID"]
+                            # Busca el TicketDetail correspondiente a este asiento y ticket
+                            ticket_detail = TicketDetail.objects.get(
+                                ticketID=ticket, seat_number=seat_number
+                            )
+                            ticket_detail.passengerID_id = passenger_id
+                            # Si tienes más campos a actualizar, agrégalos aquí
+                            ticket_detail.save()
                         # Actualiza los detalles del ticket
                         if ticket.ticket_type == "vendido":
                             payment_method = body.get("payment_method")
@@ -110,7 +123,7 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                                 description=description,
                                 ticket_id=ticket.id,
                             )
-                            cashbox.total_income += ticket.total_price
+                            cashbox.total_income += Decimal(str(ticket.total_price))
                             cashbox.final_balance = (
                                 cashbox.total_income - cashbox.total_expenses
                             )
@@ -121,6 +134,8 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                         form = TicketForm(ticket_data)
                         if form.is_valid():
                             ticket = form.save()
+                            data["ticket_id"] = ticket.id
+                            # Guarda los detalles del ticket
                             for detail in details:
                                 TicketDetail.objects.create(
                                     ticketID=ticket,

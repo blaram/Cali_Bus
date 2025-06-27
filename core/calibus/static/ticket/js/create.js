@@ -260,12 +260,19 @@ $(function () {
 
         // Usar submit_with_ajax para enviar los datos
         submit_with_ajax(
-            window.location.pathname, // URL actual
+            window.location.pathname,
             'Notificación',
             '¿Estás seguro de realizar esta acción?',
             JSON.stringify(ticketData),
-            function () {
-                window.location.href = '/calibus/ticket/list/';
+            function (response) {
+                // Abrir el PDF de la lista de pasajeros (o el ticket, según tu lógica)
+                if (response.ticket_id) {
+                    console.log('Respuesta AJAX:', response);
+                    window.open("/calibus/ticket/list/pdf/" + response.ticket_id + "/", "_blank");
+                }
+
+                // Si quieres recargar la página para actualizar los asientos vendidos:
+                location.reload();
             }
         );
     });
