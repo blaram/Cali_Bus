@@ -13,7 +13,7 @@ $(function () {
             dataSrc: ""
         },
         columns: [
-            { "data": "id" },
+            { "data": "position" },
             { "data": "origin" },
             { "data": "destination" },
             { "data": "estimated_time" },
