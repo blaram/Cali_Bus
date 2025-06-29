@@ -42,9 +42,10 @@ class UserForm(ModelForm):
                 }
             ),
             "password": PasswordInput(
+                render_value=True,
                 attrs={
                     "placeholder": "Ingrese un password",
-                }
+                },
             ),
         }
         exclude = [
