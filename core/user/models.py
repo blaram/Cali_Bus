@@ -23,7 +23,7 @@ class User(AbstractUser):
 
     def toJSON(self):
         item = model_to_dict(
-            self, exclude=["password", "groups", "user_permissions", "last_login"]
+            self, exclude=["password", "user_permissions", "last_login"]
         )
         item["last_login"] = (
             self.last_login.strftime("%d-%m-%Y") if self.last_login else ""
@@ -32,6 +32,8 @@ class User(AbstractUser):
             self.date_joined.strftime("%d-%m-%Y") if self.date_joined else ""
         )
         item["image"] = self.get_image()
+        item["full_name"] = self.get_full_name()
+        item["groups"] = [{"id": g.id, "name": g.name} for g in self.groups.all()]
         return item
 
     # def save(self, *args, **kwargs):
