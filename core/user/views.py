@@ -1,14 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
 
 from core.calibus.forms import RouteForm
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from core.user.models import User
 from core.user.forms import UserForm
+from django.contrib.auth.models import Group
 
 
 class UserListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
@@ -143,3 +144,14 @@ class UserDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Delete
         context["parent"] = "empresa"
         context["segment"] = "usuario"
         return context
+
+
+class UserChangeGroup(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        try:
+            group = Group.objects.get(pk=self.kwargs["pk"])
+            request.session["group_id"] = group.id
+            request.session["group_name"] = group.name
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy("calibus:dashboard"))

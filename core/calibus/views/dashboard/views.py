@@ -15,6 +15,10 @@ class DashboardView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        request.user.get_group_session()
+        return super().get(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         data = {}
         try:

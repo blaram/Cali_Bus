@@ -4,6 +4,9 @@ from django.forms import model_to_dict
 
 from config.settings import MEDIA_URL, STATIC_URL
 
+# Import get_current_request if you have a middleware or utility for it
+from crum import get_current_request
+
 
 class User(AbstractUser):
     image = models.ImageField(
@@ -36,11 +39,13 @@ class User(AbstractUser):
         item["groups"] = [{"id": g.id, "name": g.name} for g in self.groups.all()]
         return item
 
-    # def save(self, *args, **kwargs):
-    #     if self.pk is None:
-    #         self.set_password(self.password)
-    #     else:
-    #         user = User.objects.get(pk=self.pk)
-    #         if user.password != self.password:
-    #             self.set_password(self.password)
-    #     super().save(*args, **kwargs)
+    def get_group_session(self):
+        try:
+            request = get_current_request()
+            groups = self.groups.all()
+            if groups.exists():
+                if "group_id" not in request.session:
+                    request.session["group_id"] = groups[0].id
+                    request.session["group_name"] = groups[0].name
+        except:
+            pass
