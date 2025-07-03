@@ -23,7 +23,7 @@ from core.calibus.models import Ticket, Travel, TicketDetail, DailyCashBox, Cash
 class TravelSaleListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
     model = Travel
     template_name = "ticket/travel_sale_list.html"  # Usa tu template para la venta
-    permission_required = "calibus.view_travel"
+    permission_required = "view_travel"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -59,7 +59,7 @@ class TicketCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
     form_class = TicketForm
     template_name = "ticket/create.html"
     success_url = reverse_lazy("calibus:ticket_create")
-    permission_required = "calibus.add_ticket"
+    permission_required = "add_ticket"
     url_redirect = success_url
 
     @method_decorator(csrf_exempt)

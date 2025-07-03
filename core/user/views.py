@@ -15,7 +15,7 @@ from django.contrib.auth.models import Group
 class UserListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
     model = User
     template_name = "user/list.html"
-    permission_required = "user.view_user"
+    permission_required = "view_user"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -51,7 +51,7 @@ class UserCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
     form_class = UserForm
     template_name = "user/create.html"
     success_url = reverse_lazy("user:user_list")
-    permission_required = "user.add_user"
+    permission_required = "add_user"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -86,7 +86,7 @@ class UserUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
     form_class = UserForm
     template_name = "user/create.html"
     success_url = reverse_lazy("user:user_list")
-    permission_required = "user.change_user"
+    permission_required = "change_user"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -121,7 +121,7 @@ class UserDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Delete
     model = User
     template_name = "user/delete.html"
     success_url = reverse_lazy("user:user_list")
-    permission_required = "user.delete_user"
+    permission_required = "delete_user"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):

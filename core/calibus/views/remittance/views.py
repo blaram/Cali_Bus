@@ -13,7 +13,7 @@ from core.calibus.forms import RemittanceForm
 class RemittanceListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
     model = Remittance
     template_name = "remittance/list.html"
-    permission_required = "calibus.view_remittance"
+    permission_required = "view_remittance"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -51,7 +51,7 @@ class RemittanceCreateView(
     form_class = RemittanceForm
     template_name = "remittance/create.html"
     success_url = reverse_lazy("index")
-    permission_required = "calibus.add_remittance"
+    permission_required = "add_remittance"
     url_redirect = success_url
 
     @method_decorator(csrf_exempt)

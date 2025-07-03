@@ -17,7 +17,7 @@ from core.calibus.choices import parcel_choices
 class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
     model = Parcel
     template_name = "parcel/list.html"
-    permission_required = "calibus.view_parcel"
+    permission_required = "view_parcel"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -56,7 +56,7 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
     form_class = ParcelForm
     template_name = "parcel/create.html"
     success_url = reverse_lazy("index")
-    permission_required = "calibus.add_parcel"
+    permission_required = "add_parcel"
     url_redirect = success_url
 
     @method_decorator(csrf_exempt)

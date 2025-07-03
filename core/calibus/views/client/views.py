@@ -13,8 +13,8 @@ from core.calibus.models import Client
 
 class ClientListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
     model = Client
-    template_name = 'client/list.html'
-    permission_required = 'calibus.view_client'
+    template_name = "client/list.html"
+    permission_required = "view_client"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -23,33 +23,33 @@ class ClientListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListVi
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            action = request.POST['action']
-            if action == 'searchdata':
+            action = request.POST["action"]
+            if action == "searchdata":
                 data = []
                 for i in Client.objects.all():
                     data.append(i.toJSON())
             else:
-                data['error'] = 'Ha ocurrido un error'
+                data["error"] = "Ha ocurrido un error"
         except Exception as e:
-            data['error'] = str(e)
+            data["error"] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Listado de Clientes'
-        context['create_url'] = reverse_lazy('calibus:client_create')
-        context['list_url'] = reverse_lazy('calibus:client_list')
-        context['entity'] = 'Clientes'
-        context['segment'] = 'cliente'
+        context["title"] = "Listado de Clientes"
+        context["create_url"] = reverse_lazy("calibus:client_create")
+        context["list_url"] = reverse_lazy("calibus:client_list")
+        context["entity"] = "Clientes"
+        context["segment"] = "cliente"
         return context
 
 
 class ClientCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, CreateView):
     model = Client
     form_class = ClientForm
-    template_name = 'client/create.html'
-    success_url = reverse_lazy('calibus:client_list')
-    permission_required = 'calibus.add_client'
+    template_name = "client/create.html"
+    success_url = reverse_lazy("calibus:client_list")
+    permission_required = "add_client"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -58,31 +58,31 @@ class ClientCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            action = request.POST['action']
-            if action == 'add':
+            action = request.POST["action"]
+            if action == "add":
                 form = self.get_form()
                 data = form.save()
             else:
-                data['error'] = 'No ha ingresado a ninguna opción'
+                data["error"] = "No ha ingresado a ninguna opción"
         except Exception as e:
-            data['error'] = str(e)
+            data["error"] = str(e)
         return JsonResponse(data)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Creación un Cliente'
-        context['entity'] = 'Clientes'
-        context['list_url'] = self.success_url
-        context['action'] = 'add'
+        context["title"] = "Creación un Cliente"
+        context["entity"] = "Clientes"
+        context["list_url"] = self.success_url
+        context["action"] = "add"
         return context
 
 
 class ClientUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, UpdateView):
     model = Client
     form_class = ClientForm
-    template_name = 'client/create.html'
-    success_url = reverse_lazy('calibus:client_list')
-    permission_required = 'calibus.change_client'
+    template_name = "client/create.html"
+    success_url = reverse_lazy("calibus:client_list")
+    permission_required = "change_client"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -92,30 +92,30 @@ class ClientUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Upda
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            action = request.POST['action']
-            if action == 'edit':
+            action = request.POST["action"]
+            if action == "edit":
                 form = self.get_form()
                 data = form.save()
             else:
-                data['error'] = 'No ha ingresado a ninguna opción'
+                data["error"] = "No ha ingresado a ninguna opción"
         except Exception as e:
-            data['error'] = str(e)
+            data["error"] = str(e)
         return JsonResponse(data)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Edición un Cliente'
-        context['entity'] = 'Clientes'
-        context['list_url'] = self.success_url
-        context['action'] = 'edit'
+        context["title"] = "Edición un Cliente"
+        context["entity"] = "Clientes"
+        context["list_url"] = self.success_url
+        context["action"] = "edit"
         return context
 
 
 class ClientDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, DeleteView):
     model = Client
-    template_name = 'client/delete.html'
-    success_url = reverse_lazy('calibus:client_list')
-    permission_required = 'calibus.delete_client'
+    template_name = "client/delete.html"
+    success_url = reverse_lazy("calibus:client_list")
+    permission_required = "delete_client"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -127,26 +127,28 @@ class ClientDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Dele
         try:
             self.object.delete()
         except Exception as e:
-            data['error'] = str(e)
+            data["error"] = str(e)
         return JsonResponse(data)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Eliminación de un Cliente'
-        context['entity'] = 'Clientes'
-        context['list_url'] = self.success_url
+        context["title"] = "Eliminación de un Cliente"
+        context["entity"] = "Clientes"
+        context["list_url"] = self.success_url
         return context
 
 
 class ClientAutocompleteView(View):
     def get(self, request, *args, **kwargs):
-        term = request.GET.get('term', '')
+        term = request.GET.get("term", "")
         results = []
         if term:
             clients = Client.objects.filter(names__icontains=term)[:20]
             for client in clients:
-                results.append({
-                    'id': client.id,
-                    'text': f"{client.names} {client.surnames}".strip()
-                })
-        return JsonResponse({'results': results})
+                results.append(
+                    {
+                        "id": client.id,
+                        "text": f"{client.names} {client.surnames}".strip(),
+                    }
+                )
+        return JsonResponse({"results": results})

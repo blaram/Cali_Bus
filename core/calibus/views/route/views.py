@@ -13,7 +13,7 @@ from core.calibus.models import Route
 class RouteListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
     model = Route
     template_name = "route/list.html"
-    permission_required = "calibus.view_route"
+    permission_required = "view_route"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -53,7 +53,7 @@ class RouteCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Creat
     form_class = RouteForm
     template_name = "route/create.html"
     success_url = reverse_lazy("calibus:route_list")
-    permission_required = "calibus.add_route"
+    permission_required = "add_route"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -88,7 +88,7 @@ class RouteUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Updat
     form_class = RouteForm
     template_name = "route/create.html"
     success_url = reverse_lazy("calibus:route_list")
-    permission_required = "calibus.change_route"
+    permission_required = "change_route"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
@@ -123,7 +123,7 @@ class RouteDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Delet
     model = Route
     template_name = "route/delete.html"
     success_url = reverse_lazy("calibus:route_list")
-    permission_required = "calibus.delete_route"
+    permission_required = "delete_route"
     url_redirect = success_url
 
     def dispatch(self, request, *args, **kwargs):
