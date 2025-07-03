@@ -8,7 +8,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, V
 from core.calibus.forms import RouteForm
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from core.user.models import User
-from core.user.forms import UserForm
+from core.user.forms import UserForm, UserProfileForm
 from django.contrib.auth.models import Group
 
 
@@ -155,3 +155,40 @@ class UserChangeGroup(LoginRequiredMixin, View):
         except:
             pass
         return HttpResponseRedirect(reverse_lazy("calibus:dashboard"))
+
+
+class UserProfileView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UserProfileForm
+    template_name = "user/profile.html"
+    success_url = reverse_lazy("calibus:dashboard")
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST["action"]
+            if action == "edit":
+                form = self.get_form()
+                data = form.save()
+            else:
+                data["error"] = "No ha ingresado a ninguna opción"
+        except Exception as e:
+            data["error"] = str(e)
+        return JsonResponse(data)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Edición de perfil"
+        context["entity"] = "Perfil"
+        context["list_url"] = self.success_url
+        context["action"] = "edit"
+        context["parent"] = "empresa"
+        context["segment"] = "usuario"
+        return context

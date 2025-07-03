@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import datetime
 from core.calibus.models import Ticket, Bus
 from django.db.models import Sum, DecimalField
@@ -8,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
 
     @method_decorator(csrf_exempt)
