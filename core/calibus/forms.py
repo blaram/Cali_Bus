@@ -207,7 +207,7 @@ class ParcelForm(ModelForm):
 
         # Personalización del campo travelID
         self.fields["travelID"].queryset = Travel.objects.filter(
-            status=True
+            status="active"
         )  # Solo viajes activos
         self.fields["travelID"].widget.attrs["class"] = "form-control select2"
         self.fields["travelID"].widget.attrs["style"] = "width: 100%"

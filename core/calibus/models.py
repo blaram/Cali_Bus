@@ -372,7 +372,7 @@ class DailyCashBox(models.Model):
     )
 
     def __str__(self):
-        return f"CashBox {self.cashbox_id} - {self.date}"
+        return f"CashBox {self.id} - {self.date}"
 
     def toJSON(self):
         data = model_to_dict(self)

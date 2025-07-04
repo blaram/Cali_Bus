@@ -6,12 +6,13 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.db import transaction
+from datetime import date
 
 from django.views.generic import CreateView, ListView
 
-from core.calibus.models import Parcel, ParcelItem
+from core.calibus.models import Parcel, ParcelItem, CashMovement, DailyCashBox
 from core.calibus.forms import ParcelForm
-from core.calibus.choices import parcel_choices
+from core.calibus.choices import parcel_choices, payment_method_choices
 
 
 class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
@@ -90,10 +91,51 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
 
                     # Procesar el formulario de Parcel
                     parcel_form = ParcelForm(body)
+
+                    # Obtén el método de pago del body
+                    payment_method = body.get("payment_method")
+
+                    # Obtén la caja diaria activa
+                    cashbox = DailyCashBox.objects.filter(
+                        status="open", date=date.today()
+                    ).first()
+                    print(
+                        "Todas las cajas abiertas:",
+                        list(DailyCashBox.objects.filter(status="open")),
+                    )
+                    if not cashbox:
+                        data["error"] = (
+                            "No hay una caja diaria abierta para registrar el movimiento de caja."
+                        )
+                        return JsonResponse(data)
+
                     if parcel_form.is_valid():
                         parcel = parcel_form.save(commit=False)  # No guardar aún
                         parcel.total = total_calculated
                         parcel.save()
+
+                        # Obtén el método de pago del body (ajusta el nombre si es diferente)
+                        # payment_method = body.get("payment_method")
+
+                        # Obtén la caja diaria activa (ajusta el filtro según tu lógica de caja abierta)
+                        # cashbox = DailyCashBox.objects.filter(status="open").last()
+                        # if not cashbox:
+                        #     data["error"] = (
+                        #         "No hay una caja diaria abierta para registrar el movimiento de caja."
+                        #     )
+                        #     return JsonResponse(data)
+
+                        print("Método de pago recibido:", payment_method)
+
+                        # Crea el movimiento de caja
+                        CashMovement.objects.create(
+                            cashboxID=cashbox,
+                            movement_type="ingreso",  # o el valor correspondiente de tus choices
+                            amount=total_calculated,
+                            payment_method=payment_method,
+                            description=f"Encomienda #{parcel.id}",
+                            parcel_id=parcel.id,
+                        )
 
                         # Procesar los datos de ParcelItem enviados como JSON
                         for item_data in items:
@@ -118,6 +160,7 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["payment_method_choices"] = payment_method_choices
         context["title"] = "Registrar Encomienda"
         context["entity"] = "Encomiendas"
         context["list_url"] = self.success_url

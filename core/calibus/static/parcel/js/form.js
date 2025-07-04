@@ -141,6 +141,8 @@ $(function () {
             items: items,
         };
 
+        parcelData.payment_method = $('#payment_method').val();
+
         // Imprimir los datos en la consola
         console.log('Datos enviados:', parcelData);
 
