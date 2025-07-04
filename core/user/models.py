@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import model_to_dict
 
+import uuid
 from config.settings import MEDIA_URL, STATIC_URL
 
 # Import get_current_request if you have a middleware or utility for it
@@ -18,6 +19,7 @@ class User(AbstractUser):
     phone = models.CharField(
         max_length=20, null=True, blank=True, verbose_name="Teléfono"
     )
+    token = models.UUIDField(primary_key=False, null=True, blank=True, editable=False)
 
     def get_image(self):
         if self.image:
