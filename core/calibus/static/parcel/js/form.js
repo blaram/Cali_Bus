@@ -152,7 +152,10 @@ $(function () {
             'Notificación', // Título de la confirmación
             '¿Estás seguro de realizar esta acción?', // Mensaje de confirmación
             JSON.stringify(parcelData), // Datos a enviar
-            function () {
+            function (response) {
+                if (response.parcel_id) {
+                    window.open('/calibus/parcel/receipt/pdf/' + response.parcel_id + '/', '_blank');
+                }
                 window.location.href = '/calibus/parcel/list/'; // Redirigir después de éxito
             }
         );

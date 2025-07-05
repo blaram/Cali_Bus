@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo de Envío de Encomienda</title>
+    <style>
+        @page { 
+            size: 80mm 140mm; 
+            margin: 3mm; 
+        }
+        
+        body { 
+            font-family: Arial, sans-serif;
+            font-size: 9px; 
+            margin: 0; 
+            padding: 0; 
+            line-height: 1.2;
+            color: #000;
+        }
+        
+        .container {
+            border: 2px solid #000;
+            padding: 4px;
+        }
+        
+        .header { 
+            margin-bottom: 8px; 
+            padding-bottom: 4px;
+            border-bottom: 1px solid #000;
+        }
+        
+        .logo {
+            width: 50px;
+            height: auto;
+        }
+        
+        .receipt-info {
+            font-size: 8px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        
+        .section {
+            margin-bottom: 6px;
+            padding: 3px;
+            border: 1px solid #000;
+        }
+        
+        .section-title {
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            padding: 1px 0;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+            font-size: 8px;
+        }
+        
+        .info-table td {
+            padding: 1px 2px;
+            vertical-align: top;
+        }
+        
+        .info-table .label {
+            font-weight: bold;
+            width: 30%;
+        }
+        
+        .info-table .value {
+            width: 70%;
+        }
+        
+        .items-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 6px; 
+            font-size: 8px;
+        }
+        
+        .items-table th, .items-table td { 
+            border: 1px solid #000; 
+            padding: 2px 1px; 
+            text-align: center; 
+        }
+        
+        .items-table th { 
+            background-color: #000; 
+            color: #fff;
+            font-weight: bold;
+            font-size: 7px;
+        }
+        
+        .items-table .desc-col {
+            text-align: left;
+            font-size: 7px;
+        }
+        
+        .totals { 
+            text-align: center;
+            margin: 6px 0;
+            padding: 4px;
+            border: 2px solid #000;
+            background-color: #000;
+            color: #fff;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 6px;
+            padding-top: 4px;
+            border-top: 1px solid #000;
+            font-size: 7px;
+            font-style: italic;
+        }
+        
+        .route-box {
+            text-align: center;
+            font-weight: bold;
+            font-size: 9px;
+            margin: 3px 0;
+            padding: 3px;
+            border: 1px solid #000;
+        }
+        
+        .status-box {
+            padding: 2px 4px;
+            border: 1px solid #000;
+            font-weight: bold;
+            font-size: 8px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        
+        .two-col-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+        
+        .two-col-table td {
+            width: 50%;
+            padding: 3px;
+            border: 1px solid #000;
+            vertical-align: top;
+        }
+        
+        .col-title {
+            font-weight: bold;
+            font-size: 8px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            text-align: center;
+            border-bottom: 1px solid #000;
+            padding-bottom: 1px;
+        }
+        
+        .col-content {
+            font-size: 8px;
+            text-align: center;
+        }
+        
+        .separator {
+            text-align: center;
+            margin: 4px 0;
+            font-size: 8px;
+        }
+        
+        .bold {
+            font-weight: bold;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        .right {
+            text-align: right;
+        }
+        
+        .small {
+            font-size: 7px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 30%; vertical-align: middle;">
+                        {% if logo %}
+                        <img src="{{ logo }}" class="logo" alt="Logo Empresa" />
+                        {% endif %}
+                    </td>
+                    <td style="width: 70%; vertical-align: middle; text-align: right;">
+                        <h2 style="margin: 0; font-size: 12px; font-weight: bold;">RECIBO DE ENVIO</h2>
+                        <div class="receipt-info" style="text-align: right; margin-top: 2px;">
+                            <div>FECHA: {{ parcel.date_joined }}</div>
+                            <div>N° ENCOMIENDA: {{ parcel.id }}</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <table class="two-col-table">
+            <tr>
+                <td>
+                    <div class="col-title">Remitente</div>
+                    <div class="col-content">
+                        <div class="bold">{{ parcel.senderID.names }} {{ parcel.senderID.surnames }}</div>
+                        <div>CI: {{ parcel.senderID.ci }}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-title">Consignatario</div>
+                    <div class="col-content">
+                        <div class="bold">{{ parcel.receiverID.names }} {{ parcel.receiverID.surnames }}</div>
+                        <div>CI: {{ parcel.receiverID.ci }}</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="route-box">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 60%; text-align: left; vertical-align: middle;">
+                        <div class="bold">{{ parcel.travelID.routeID.origin }} → {{ parcel.travelID.routeID.destination }}</div>
+                    </td>
+                    <td style="width: 40%; text-align: right; vertical-align: middle;">
+                        <div class="bold">Bus: {{ parcel.travelID.busID.license_plate }}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <table class="info-table">
+                <tr>
+                    <td class="label">SALIDA:</td>
+                    <td class="value">{{ parcel.travelID.departure }} {{ parcel.travelID.departure_time }}</td>
+                </tr>
+                <tr>
+                    <td class="label">ESTADO:</td>
+                    <td class="value">
+                        <span class="status-box">{{ parcel.get_status_display }}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section-title">Detalle de Encomienda</div>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>CANT.</th>
+                    <th>DESCRIPCIÓN</th>
+                    <th>PESO</th>
+                    <th>VAL. DECL.</th>
+                    <th>ENVÍO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.quantity }}</td>
+                    <td class="desc-col">{{ item.description }}</td>
+                    <td>{{ item.weight }}</td>
+                    <td>{{ item.declared_value }}</td>
+                    <td>{{ item.shipping_cost }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals">
+            TOTAL ENVÍO: {{ parcel.total }} Bs.
+        </div>
+
+        <div class="separator">
+            ================================
+        </div>
+
+        <div class="footer">
+            Gracias por confiar en nuestro servicio<br>
+            Conserve este recibo como comprobante
+        </div>
+    </div>
+</body>
+</html>

@@ -40,6 +40,11 @@ urlpatterns = [
     path("parcel/list/", ParcelListView.as_view(), name="parcel_list"),
     path("parcel/add/", ParcelCreateView.as_view(), name="parcel_create"),
     path("parcel/change_status/", change_status, name="parcel_change_status"),
+    path(
+        "parcel/receipt/pdf/<int:pk>/",
+        ParcelReceiptPdfView.as_view(),
+        name="parcel_receipt_pdf",
+    ),
     # bus
     path("bus/list/", BusListView.as_view(), name="bus_list"),
     path("bus/add/", BusCreateView.as_view(), name="bus_create"),

@@ -1,18 +1,23 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from core.calibus.mixins import ValidatePermissionRequiredMixin
 from django.urls import reverse_lazy
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.db import transaction
 from datetime import date
-
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, View
 
 from core.calibus.models import Parcel, ParcelItem, CashMovement, DailyCashBox
 from core.calibus.forms import ParcelForm
 from core.calibus.choices import parcel_choices, payment_method_choices
+
+import os
+from django.conf import settings
+from django.template import Context
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 
 class ParcelListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
@@ -150,6 +155,9 @@ class ParcelCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Crea
                         data["message"] = (
                             "Encomienda y artículos guardados correctamente."
                         )
+                        data["parcel_id"] = (
+                            parcel.id
+                        )  # Agregar el ID de la encomienda al JSON de respuesta
                     else:
                         data["error"] = parcel_form.errors
             else:
@@ -200,3 +208,41 @@ def change_status(request):
     except Exception as e:
         data["error"] = str(e)
     return JsonResponse(data)
+
+
+class ParcelReceiptPdfView(View):
+    def link_callback(self, uri, rel):
+        sUrl = settings.STATIC_URL
+        sRoot = settings.STATICFILES_DIRS[0]
+        mUrl = settings.MEDIA_URL
+        mRoot = settings.MEDIA_ROOT
+
+        if uri.startswith(mUrl):
+            path = os.path.join(mRoot, uri.replace(mUrl, ""))
+        elif uri.startswith(sUrl):
+            path = os.path.join(sRoot, uri.replace(sUrl, ""))
+        else:
+            return uri
+
+        if not os.path.isfile(path):
+            raise Exception("El recurso %s no existe" % path)
+        return path
+
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            template = get_template("parcel/parcel_receipt_pdf.html")
+            parcel = Parcel.objects.get(pk=pk)
+            items = ParcelItem.objects.filter(parcelID=parcel)
+            context = {
+                "parcel": parcel,
+                "items": items,
+                "logo": f"{settings.STATIC_URL}img/logo_calibus.png",
+            }
+            html = template.render(context)
+            response = HttpResponse(content_type="application/pdf")
+            response["Content-Disposition"] = 'inline; filename="parcel_receipt.pdf"'
+            pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
+            return response
+        except Exception as e:
+            print("Error al generar PDF:", e)
+            return HttpResponse("Ocurrió un error al generar el PDF: %s" % str(e))
