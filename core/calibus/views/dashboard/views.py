@@ -32,10 +32,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     "data": self.get_graph_sales_year_month(),
                 }
             elif action == "get_graph_sales_tickets_year_month":
+                # Obtén el mes del POST, si no viene usa el actual
+                month = int(request.POST.get("month", datetime.now().month))
                 data = {
                     "name": "Boletos vendidos",
                     "colorByPoint": True,
-                    "data": self.get_graph_sales_tickets_year_month(),
+                    "data": self.get_graph_sales_tickets_year_month(month),
                 }
             else:
                 data["error"] = "Ha ocurrido un error"
@@ -65,10 +67,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             data = [0] * 12
         return data
 
-    def get_graph_sales_tickets_year_month(self):
+    def get_graph_sales_tickets_year_month(self, month):
         data = []
         year = datetime.now().year
-        month = datetime.now().month
         try:
             buses = Bus.objects.all()
             total_tickets = Ticket.objects.filter(

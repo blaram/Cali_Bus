@@ -9,15 +9,33 @@
 
 {% block content %}
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-12">
-                <div id="container"></div>
+        <div class="row mb-3">
+            <div class="col-lg-12 text-right">
+                <label for="select-mes">Selecciona el mes:</label>
+                <select id="select-mes" class="form-control d-inline-block" style="width:auto;">
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6" selected>Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
             </div>
         </div>
-        <br>
         <div class="row">
-            <div class="col-lg-12">
-                <div id="container-pie"></div>
+            <!-- Gráfico de barras: ocupa 8 columnas -->
+            <div class="col-lg-8">
+                <div id="container"></div>
+            </div>
+            <!-- Gráfico de pie: ocupa 4 columnas -->
+            <div class="col-lg-4">
+                <div id="container-pie" style="height: 400px;"></div>
             </div>
         </div>
         <br>
@@ -97,7 +115,8 @@
                     dataLabels: {
                         enabled: true,
                         format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                    }
+                    },
+                    size: '75%',
                 }
             },
         });
@@ -125,15 +144,29 @@
         }
 
         function get_graph_sales_tickets_year_month() {
+            var mes = $('#select-mes').val();
             $.ajax({
                 url: window.location.pathname,
                 type: "POST",
                 data: {
-                    'action': 'get_graph_sales_tickets_year_month'
+                    'action': 'get_graph_sales_tickets_year_month',
+                    'month': mes
                 },
                 dataType: "json",
             }).done(function(data) {
                 if (!data.hasOwnProperty('error')) {
+                    // Limpiar el gráfico de pie
+                    while (graphpie.series.length > 0) {
+                        graphpie.series[0].remove(true);
+                    }
+                    // Cambiar el título dinámicamente
+                    var meses = [
+                        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                    ];
+                    var mesNombre = meses[parseInt(mes) - 1];
+                    graphpie.setTitle({ text: "Boletos vendidos por bus en el mes de " + mesNombre + " del año 2025" });
+
                     graphpie.addSeries({
                         name: data.name || 'Buses',
                         colorByPoint: true,
@@ -150,6 +183,10 @@
         $(document).ready(function() {
             get_graph_sales_year_month();
             get_graph_sales_tickets_year_month();
+
+            $('#select-mes').change(function() {
+                get_graph_sales_tickets_year_month();
+            });
         });
     </script>
 {% endblock content %}
